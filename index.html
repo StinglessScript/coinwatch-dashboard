@@ -1,0 +1,671 @@
+<title>Coin Watch</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#F1F3F0;
+    --surface:#FFFFFF;
+    --surface-2:#E7EBE7;
+    --hairline:#D2D8D1;
+    --ink:#10201B;
+    --muted:#5B6B63;
+    --brass:#8A6D1A;
+    --brass-soft:#F2E7C9;
+    --bull:#2F7D53;
+    --bull-soft:#E1F1E7;
+    --bear:#A5392F;
+    --bear-soft:#F7E4E1;
+    --mixed:#8A6D1A;
+    --mixed-soft:#F2E7C9;
+    --imp-high:#A5392F;
+    --imp-med:#9A6A12;
+    --imp-low:#5B6B63;
+    --font-display:'Fraunces', Georgia, serif;
+    --font-body:'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --bg:#0B1210;
+      --surface:#131C1A;
+      --surface-2:#182220;
+      --hairline:#28352F;
+      --ink:#EAEFEC;
+      --muted:#8FA39B;
+      --brass:#D8B85C;
+      --brass-soft:#2A2312;
+      --bull:#5CBE8B;
+      --bull-soft:#132A1E;
+      --bear:#E07A6C;
+      --bear-soft:#2E1714;
+      --mixed:#D8B85C;
+      --mixed-soft:#2A2312;
+      --imp-high:#E07A6C;
+      --imp-med:#E0B25C;
+      --imp-low:#8FA39B;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1210;
+    --surface:#131C1A;
+    --surface-2:#182220;
+    --hairline:#28352F;
+    --ink:#EAEFEC;
+    --muted:#8FA39B;
+    --brass:#D8B85C;
+    --brass-soft:#2A2312;
+    --bull:#5CBE8B;
+    --bull-soft:#132A1E;
+    --bear:#E07A6C;
+    --bear-soft:#2E1714;
+    --mixed:#D8B85C;
+    --mixed-soft:#2A2312;
+    --imp-high:#E07A6C;
+    --imp-med:#E0B25C;
+    --imp-low:#8FA39B;
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;}
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 24px 80px;}
+
+  .masthead{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:14px;gap:20px;flex-wrap:wrap;
+  }
+  .masthead h1{font-family:var(--font-display);font-weight:600;font-size:clamp(28px,4vw,40px);margin:0;letter-spacing:-0.01em;text-wrap:balance;}
+  .masthead .sub{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .as-of{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-align:right;}
+  .as-of b{color:var(--ink);font-weight:600;}
+
+  .disclaimer{
+    background:var(--surface);border:1px solid var(--hairline);border-left:3px solid var(--brass);
+    color:var(--ink);border-radius:6px;padding:12px 16px;font-size:12.5px;
+    display:flex;gap:10px;align-items:flex-start;margin-bottom:24px;
+  }
+  .disclaimer .tag{
+    font-family:var(--font-mono);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--brass);white-space:nowrap;padding-top:1px;
+  }
+
+  .top-row{
+    display:grid;grid-template-columns:260px 1fr;gap:1px;background:var(--hairline);
+    border:1px solid var(--hairline);border-radius:8px;overflow:hidden;margin-bottom:28px;
+  }
+  @media (max-width:760px){ .top-row{grid-template-columns:1fr;} }
+  .sentiment{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;gap:6px;}
+  .sentiment .lbl{font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+  .gauge{position:relative;height:8px;border-radius:4px;background:linear-gradient(90deg, var(--bear) 0%, var(--imp-med) 50%, var(--bull) 100%);margin:4px 0;}
+  .gauge .now{position:absolute;top:-4px;width:2px;height:16px;background:var(--ink);border-radius:1px;}
+  .gauge .prev{position:absolute;top:-2px;width:2px;height:12px;background:var(--muted);border-radius:1px;opacity:.6;}
+  .sentiment .readout{font-family:var(--font-mono);font-size:20px;font-weight:600;font-variant-numeric:tabular-nums;}
+  .sentiment .delta{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
+  .sentiment .dom{font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--hairline);}
+
+  .ticker{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--hairline);}
+  .tick{background:var(--surface);padding:14px 16px;}
+  .tick .sym{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.05em;}
+  .tick .px{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:20px;font-weight:600;margin-top:2px;}
+  .tick .chg{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:12.5px;margin-top:2px;}
+  .chg.up{color:var(--bull);}
+  .chg.down{color:var(--bear);}
+
+  .panel-title{
+    font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;
+    color:var(--muted);margin:0 0 14px;display:flex;align-items:center;gap:8px;
+  }
+  .panel-title::after{content:"";flex:1;height:1px;background:var(--hairline);}
+
+  .sector-label{
+    font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--brass);margin:26px 0 10px;
+  }
+  .sector-label:first-of-type{margin-top:0;}
+
+  /* Coin card — integrated price + signal + news reasons */
+  .coin-list{display:flex;flex-direction:column;gap:12px;}
+  .coin-card{background:var(--surface);border:1px solid var(--hairline);border-radius:10px;padding:18px 20px;}
+  .coin-top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
+  .coin-id{display:flex;align-items:baseline;gap:8px;}
+  .coin-id .name{font-family:var(--font-display);font-weight:600;font-size:20px;}
+  .coin-id .sym{font-family:var(--font-mono);color:var(--muted);font-size:12.5px;}
+  .coin-price{display:flex;align-items:baseline;gap:10px;font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
+  .coin-price .px{font-size:16px;font-weight:600;}
+  .coin-price .chg{font-size:13px;}
+
+  .signal{
+    display:inline-flex;align-items:center;gap:6px;font-family:var(--font-mono);font-size:11px;
+    text-transform:uppercase;letter-spacing:.04em;padding:4px 10px;border-radius:999px;font-weight:600;
+    margin-bottom:12px;
+  }
+  .signal::before{content:"";width:7px;height:7px;border-radius:999px;}
+  .signal.bull{background:var(--bull-soft);color:var(--bull);}
+  .signal.bull::before{background:var(--bull);}
+  .signal.bear{background:var(--bear-soft);color:var(--bear);}
+  .signal.bear::before{background:var(--bear);}
+  .signal.mixed{background:var(--mixed-soft);color:var(--mixed);}
+  .signal.mixed::before{background:var(--mixed);}
+  .signal.none{background:var(--surface-2);color:var(--muted);}
+  .signal.none::before{background:var(--muted);}
+
+  .news-list{display:flex;flex-direction:column;gap:10px;}
+  .news-item{display:grid;grid-template-columns:16px 1fr;gap:10px;}
+  .news-dir{width:16px;padding-top:3px;text-align:center;font-size:12px;line-height:1;}
+  .news-dir.bull{color:var(--bull);}
+  .news-dir.bear{color:var(--bear);}
+  .news-dir.neutral{color:var(--muted);}
+  .news-body .head{display:flex;align-items:center;gap:8px;margin-bottom:2px;flex-wrap:wrap;}
+  .news-body .headline{font-size:13.5px;font-weight:600;}
+  .imp-badge{
+    font-family:var(--font-mono);font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:3px;
+    text-transform:uppercase;letter-spacing:.03em;
+  }
+  .imp-high{background:var(--bear-soft);color:var(--imp-high);}
+  .imp-med{background:var(--brass-soft);color:var(--imp-med);}
+  .imp-low{background:var(--surface-2);color:var(--imp-low);}
+  .news-date{font-family:var(--font-mono);font-size:10.5px;color:var(--muted);white-space:nowrap;}
+  .news-body .reason{font-size:12.5px;color:var(--muted);line-height:1.5;}
+  .coin-plainnote{font-size:12.5px;color:var(--muted);line-height:1.5;background:var(--surface-2);border-radius:6px;padding:10px 12px;margin-top:2px;}
+
+  /* Coin table — Tin tức | Tín hiệu tin tức columns */
+  .coin-table-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:10px;}
+  table.coins{width:100%;border-collapse:collapse;font-size:13px;}
+  table.coins thead th{
+    text-align:left;padding:10px 14px;font-family:var(--font-mono);font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+    background:var(--surface-2);border-bottom:1px solid var(--hairline);white-space:nowrap;
+  }
+  table.coins tbody td{padding:14px;border-bottom:1px solid var(--hairline);vertical-align:top;background:var(--surface);}
+  table.coins tbody tr.sector-row td{
+    background:var(--surface-2);font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;
+    letter-spacing:.08em;color:var(--brass);padding:8px 14px;border-bottom:1px solid var(--hairline);
+  }
+  td.col-coin{white-space:nowrap;width:150px;}
+  td.col-coin .name{font-family:var(--font-display);font-weight:600;font-size:16px;display:block;}
+  td.col-coin .sym{font-family:var(--font-mono);color:var(--muted);font-size:11px;}
+  td.col-coin .px{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:13px;margin-top:6px;display:block;}
+  td.col-coin .chg{font-family:var(--font-mono);font-variant-numeric:tabular-nums;font-size:11.5px;}
+  td.col-news{min-width:320px;max-width:460px;}
+  td.col-news ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;}
+  td.col-news li{display:grid;grid-template-columns:14px 1fr;gap:8px;}
+  td.col-news .d{font-size:11px;line-height:1.5;}
+  td.col-news .d.bull{color:var(--bull);}
+  td.col-news .d.bear{color:var(--bear);}
+  td.col-news .d.neutral{color:var(--muted);}
+  td.col-news .h{font-size:12.5px;font-weight:600;line-height:1.4;}
+  td.col-news .r{font-size:11.5px;color:var(--muted);line-height:1.45;margin-top:1px;}
+  td.col-news .meta{font-family:var(--font-mono);font-size:9.5px;color:var(--muted);text-transform:uppercase;margin-left:6px;}
+  td.col-signal{width:220px;}
+  td.col-signal .rationale{font-size:11.5px;color:var(--muted);line-height:1.5;margin-top:8px;}
+
+  /* Full market table */
+  .market-section{margin-top:40px;}
+  .market-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px;}
+  .market-search{
+    font-family:var(--font-mono);font-size:13px;color:var(--ink);background:var(--surface);
+    border:1px solid var(--hairline);border-radius:6px;padding:8px 12px;width:220px;
+  }
+  .market-search:focus{outline:none;border-color:var(--brass);}
+  .market-toggle{font-family:var(--font-mono);font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px;cursor:pointer;}
+  .market-count{font-family:var(--font-mono);font-size:11px;color:var(--muted);}
+  .market-table-wrap{overflow-x:auto;border:1px solid var(--hairline);border-radius:8px;max-height:640px;overflow-y:auto;}
+  table.market{width:100%;border-collapse:collapse;font-family:var(--font-mono);font-size:12.5px;}
+  table.market thead th{
+    position:sticky;top:0;background:var(--surface-2);text-align:right;padding:9px 12px;font-weight:600;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.05em;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--hairline);white-space:nowrap;
+  }
+  table.market thead th:first-child{text-align:left;}
+  table.market thead th.sorted{color:var(--ink);}
+  table.market tbody td{text-align:right;padding:7px 12px;border-bottom:1px solid var(--hairline);font-variant-numeric:tabular-nums;background:var(--surface);vertical-align:top;}
+  table.market tbody td:first-child{text-align:left;font-weight:600;font-family:var(--font-body);}
+  table.market tbody tr:hover td{background:var(--surface-2);}
+  table.market tbody tr.has-news td{background:color-mix(in srgb, var(--brass-soft) 35%, var(--surface));}
+  table.market tbody tr.has-news:hover td{background:color-mix(in srgb, var(--brass-soft) 55%, var(--surface));}
+  .mkt-up{color:var(--bull);}
+  .mkt-down{color:var(--bear);}
+  td.mkt-news{text-align:left;min-width:260px;max-width:380px;font-family:var(--font-body);white-space:normal;}
+  td.mkt-news ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;}
+  td.mkt-news li{display:grid;grid-template-columns:13px 1fr;gap:6px;font-size:11.5px;line-height:1.4;}
+  td.mkt-news .d.bull{color:var(--bull);}
+  td.mkt-news .d.bear{color:var(--bear);}
+  td.mkt-news .d.neutral{color:var(--muted);}
+  td.mkt-news .h{font-weight:600;color:var(--ink);}
+  td.mkt-news .r{color:var(--muted);}
+  td.mkt-news .none{color:var(--muted);font-family:var(--font-mono);font-size:11.5px;}
+  td.mkt-signal{text-align:left;min-width:170px;white-space:normal;font-family:var(--font-body);}
+
+  footer{
+    margin-top:36px;padding-top:16px;border-top:1px solid var(--hairline);
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  }
+</style>
+
+<div class="wrap">
+  <div class="masthead">
+    <div>
+      <div class="sub">Giám sát tác động thị trường Crypto</div>
+      <h1>Coin Watch</h1>
+    </div>
+    <div class="as-of">Dữ liệu tính đến <b>21/08/2026, 07:00</b><br>Tự động cập nhật: hàng ngày</div>
+  </div>
+
+  <div class="disclaimer">
+    <span class="tag">Không phải dự đoán giá</span>
+    <span>"Tín hiệu tin tức" dưới đây là <b>tổng hợp sắc thái của tin tức đã xảy ra</b> (dòng vốn ETF, quy định, on-chain...) — nghiêng tích cực hay tiêu cực chỉ phản ánh chiều hướng của thông tin công khai, <b>không phải dự đoán giá sẽ tăng hay giảm</b>. Diễn biến giá thực tế phụ thuộc nhiều yếu tố không thể lường trước. Tự nghiên cứu và tự chịu trách nhiệm quyết định.</span>
+  </div>
+
+  <div class="top-row">
+    <div class="sentiment">
+      <div class="lbl">Chỉ số Sợ hãi &amp; Tham lam</div>
+      <div class="readout">73 <span style="font-size:12px;font-weight:400;color:var(--muted);">— Tham lam</span></div>
+      <div class="gauge"><div class="now" style="left:73%;"></div><div class="prev" style="left:30%;"></div></div>
+      <div class="delta">30 (Sợ hãi, 17/8) → 73 (Tham lam, 20/8) — một trong những cú đảo chiều mạnh nhất năm nay</div>
+      <div class="dom">Vốn hoá: BTC 56,1% · ETH 10,1% · Altcoin còn lại ~33,8% của 2.252 tỷ USD</div>
+    </div>
+    <div class="ticker">
+      <div class="tick"><div class="sym">BTC · Bitcoin</div><div class="px">$74.727</div><div class="chg up">▲ +7,79% 24h</div></div>
+      <div class="tick"><div class="sym">ETH · Ethereum</div><div class="px">$2.353</div><div class="chg up">▲ +4,39% 24h</div></div>
+      <div class="tick"><div class="sym">SOL · Solana</div><div class="px">$88,38</div><div class="chg up">▲ +4,30% 24h</div></div>
+      <div class="tick"><div class="sym">XRP</div><div class="px">$1,289</div><div class="chg up">▲ +16,32% 24h</div></div>
+    </div>
+  </div>
+
+  <div class="market-section">
+    <div class="market-head">
+      <p class="panel-title" style="margin:0;flex:1;">Toàn bộ coin giao dịch trên OKX (cặp USDT)</p>
+    </div>
+    <div class="market-head">
+      <input class="market-search" id="marketSearch" type="text" placeholder="Tìm coin, vd. SOL, PEPE...">
+      <label class="market-toggle"><input type="checkbox" id="newsOnly"> Chỉ hiện coin có tin tức</label>
+      <span class="market-count" id="marketCount"></span>
+    </div>
+    <div class="disclaimer" style="margin-bottom:12px;">
+      <span class="tag">Không phải dự đoán giá</span>
+      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~58 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar...) — routine hàng ngày sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
+    </div>
+    <div class="market-table-wrap">
+      <table class="market" id="marketTable">
+        <thead>
+          <tr>
+            <th data-key="sym">Coin</th>
+            <th data-key="px">Giá (USD)</th>
+            <th data-key="chg" class="sorted">Thay đổi 24h</th>
+            <th data-key="vol">Khối lượng 24h (USD)</th>
+            <th data-key="news" style="cursor:default;">Tin tức liên quan</th>
+            <th data-key="signal" style="cursor:default;">Tín hiệu tin tức</th>
+          </tr>
+        </thead>
+        <tbody id="marketBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>
+    <span>Nguồn: CoinDesk, CryptoSlate, Investing.com, Tech Times, 24/7 Wall St., Chase, Yahoo Finance, Milk Road, Blockhead, BVNK, OKX Public API</span>
+    <span>Cập nhật tự động qua routine hàng ngày — không phải hệ thống dự đoán giá</span>
+  </footer>
+</div>
+
+<script>
+  const OKX_ROWS = [["BTC",74727.1,7.79,1003960929.0],["ETH",2353.2,4.39,473400289.0],["XRP",1.2889,16.32,167728504.0],["USDC",1.0002,-0.03,163121485.0],["SOL",88.38,4.3,102094681.0],["DOGE",0.08197,9.24,85835749.0],["HYPE",74.467,7.75,81860702.0],["USDG",1.0005,-0.03,63463697.0],["PEPE",3e-06,10.93,28972076.0],["ZEC",574.05,2.51,23401383.0],["PUMP",0.003752,21.07,19499194.0],["SUI",0.74,4.99,19472272.0],["OKB",107.44,5.02,18197074.0],["BNB",659.9,5.67,16872547.0],["WLD",0.3728,2.14,13587127.0],["LIT",2.6649,1.47,13444736.0],["BOME",0.001144,31.47,13129496.0],["XSNDK",1600.21,0.15,11965155.0],["TRUMP",1.65,-6.57,11707332.0],["XAUT",4509.0,0.69,11610211.0],["ADA",0.2054,10.49,10865029.0],["FIL",0.7507,11.53,10565222.0],["UNI",3.824,4.65,10380889.0],["ENA",0.11867,26.43,9551887.0],["ACE",0.24356,24.52,9533187.0],["XCRCL",85.35,6.61,9520543.0],["XMSTR",117.59,9.14,9300781.0],["AVAX",7.258,7.22,8919768.0],["XLM",0.18496,7.86,7980406.0],["ONDO",0.36,3.24,7686599.0],["BCH",225.1,6.58,7504121.0],["TRX",0.3382,1.26,7392218.0],["MON",0.02663,17.68,7171744.0],["ORDI",4.181,13.74,7066051.0],["RLUSD",1.0007,0.0,6779248.0],["XSOXL",123.63,-1.36,6666199.0],["PENGU",0.007222,11.5,6417121.0],["LINK",10.751,2.68,6282307.0],["XSPCX",134.42,-3.45,6270265.0],["XMU",979.15,3.15,5963323.0],["GRVT",0.28004,-8.21,5873398.0],["LTC",48.1,2.41,5850563.0],["NEAR",1.774,1.78,5815524.0],["ASTER",0.6751,7.35,5579145.0],["XPL",0.08882,10.05,5536540.0],["PEOPLE",0.010558,31.99,5407997.0],["RE",0.50408,-7.54,4963644.0],["XINTC",92.57,-1.41,4914902.0],["XSKHY",167.92,4.2,4831582.0],["GRAM",1.407,3.68,4609262.0],["XMRVL",250.11,4.2,4529333.0],["KAITO",0.3508,0.6,4271074.0],["AAVE",98.99,3.48,4174910.0],["DOS",0.2352,-5.62,4017582.0],["ARB",0.09106,4.16,3909296.0],["PAXG",4518.5,0.72,3837301.0],["SHIB",5e-06,4.82,3791678.0],["WLFI",0.06053,-1.74,3681347.0],["BICO",0.02019,21.7,3474357.0],["VIRTUAL",0.6434,4.65,3344819.0],["PI",0.09125,1.68,3170102.0],["ALLO",0.30478,4.7,3021385.0],["BONK",3e-06,6.86,3014478.0],["DOT",0.8456,6.85,2998593.0],["ICP",2.387,2.84,2899982.0],["XLITE",878.6,4.31,2868105.0],["CRV",0.2859,9.75,2830500.0],["HBAR",0.07418,4.82,2506083.0],["MOODENG",0.04352,14.41,2459393.0],["AEON",0.07534,-6.51,2336556.0],["ZRO",0.8662,-1.18,2234807.0],["WIF",0.1639,11.42,2200906.0],["GRASS",0.3113,6.28,2184544.0],["ETC",6.965,5.63,2111577.0],["TAO",215.4,4.36,2094975.0],["BETH",2349.8,4.32,2094064.0],["XCBRS",209.76,-3.8,2088397.0],["ETHFI",0.5389,3.57,2079450.0],["BIO",0.0312,8.98,2011444.0],["CRO",0.05339,7.06,2002614.0],["OP",0.0969,9.08,1986952.0],["CC",0.09859,-1.12,1976182.0],["XCOIN",176.48,6.69,1973973.0],["CORE",0.02453,12.83,1945574.0],["ONT",0.05371,31.97,1941026.0],["PNUT",0.05194,12.72,1918516.0],["MET",0.2235,5.13,1829253.0],["NEIRO",8.8e-05,28.9,1808334.0],["JTO",0.5735,0.07,1753420.0],["FET",0.1456,10.98,1607829.0],["APT",0.5751,2.94,1600610.0],["INJ",4.74,2.02,1556059.0],["SATS",0.0,11.44,1544481.0],["XTSLA",346.71,-1.19,1476900.0],["POL",0.08076,-1.11,1465231.0],["XCRWV",90.44,-1.74,1401212.0],["BASED",0.08358,5.03,1369575.0],["XQQQ",712.71,-0.95,1369117.0],["ZAMA",0.04733,3.05,1357178.0],["XNBIS",223.0,-2.43,1306318.0],["MORPHO",2.3042,4.37,1306188.0],["TIA",0.3414,5.66,1296447.0],["STRK",0.02575,6.54,1246315.0],["EDGE",0.341,10.0,1239985.0],["RENDER",1.404,1.81,1225061.0],["ROBO",0.01317,0.84,1186591.0],["XMETA",546.99,-0.72,1137620.0],["CHIP",0.03273,16.73,1130919.0],["MEGA",0.038,9.29,1109592.0],["SLX",0.06713,2.79,1097845.0],["AR",2.053,10.5,1078393.0],["LDO",0.3406,0.53,1066448.0],["DATA",0.1881,3.41,1059023.0],["ALGO",0.08796,7.02,1026643.0],["GALA",0.001626,12.76,1017341.0],["EIGEN",0.1959,6.47,1006738.0],["JUP",0.1918,6.38,978208.0],["OKSOL",88.4,4.32,968932.0],["XHOOD",95.89,-2.22,965558.0],["SKY",0.0624,1.23,871245.0],["CHZ",0.0132,3.37,858313.0],["GAS",1.178,18.81,847628.0],["COMP",19.02,3.48,822181.0],["XHIMS",31.79,3.05,807055.0],["NIGHT",0.019915,4.15,766591.0],["PENDLE",1.531,4.29,759536.0],["DYDX",0.11337,3.19,741660.0],["STX",0.1481,13.57,738557.0],["XBMNR",21.85,0.88,707588.0],["DASH",33.08,4.06,698997.0],["ATOM",1.514,1.54,679119.0],["XGOOGL",341.06,-1.32,678215.0],["XAVGO",365.73,-0.36,669547.0],["XAMD",470.71,-0.15,656975.0],["XEWY",180.47,0.98,637606.0],["AI",0.02071,-1.19,635238.0],["W",0.009032,4.36,629034.0],["APE",0.13185,2.58,619206.0],["ZBCN",0.00187,5.01,601613.0],["AVNT",0.09391,5.16,585607.0],["XAAPL",311.8,-1.71,579753.0],["MERL",0.01996,6.45,575873.0],["XNVDA",217.42,-0.76,570592.0],["ARKM",0.09698,4.46,559562.0],["XRKLB",73.5,-3.63,550342.0],["MMT",0.1775,-3.27,540062.0],["2Z",0.05396,5.33,530638.0],["XSPY",763.47,-0.88,530053.0],["CFX",0.04503,2.86,523316.0],["AXS",0.9721,7.81,491129.0],["IOTA",0.03813,5.51,477500.0],["ACT",0.011034,5.71,472575.0],["SPACE",0.005537,7.22,470632.0],["FLR",0.006955,8.01,464102.0],["LAT",0.000552,5.0,459813.0],["TRB",14.85,6.6,446185.0],["SNX",0.2134,3.95,434783.0],["CFG",0.13365,-1.59,432641.0],["BIGTIME",0.005662,4.46,428950.0],["QTUM",0.8059,11.73,422644.0],["RAY",0.6978,7.57,419748.0],["VINE",0.007848,5.84,419330.0],["STETH",2352.65,4.45,417042.0],["PYTH",0.04446,5.21,413710.0],["SNT",0.006933,31.03,388563.0],["XPLTR",174.17,-0.41,385952.0],["ATH",0.004204,4.21,384790.0],["XTZ",0.2239,2.71,379720.0],["CSPR",0.002641,-1.42,378489.0],["XTSM",417.47,0.59,376669.0],["LUNA",0.04653,5.01,374383.0],["MEW",0.000381,9.99,374070.0],["XMSFT",481.41,-0.7,364442.0],["FLOKI",2.4e-05,8.43,359820.0],["OL",0.004421,-7.53,355456.0],["XORCL",142.36,-1.9,345288.0],["ENS",4.52,7.19,342686.0],["G",0.004119,0.0,341839.0],["BERA",0.1736,11.86,323235.0],["FOGO",0.008952,5.83,314091.0],["NEO",1.982,8.84,313572.0],["ZK",0.008771,6.08,309308.0],["KAT",0.00464,3.66,308872.0],["SEI",0.0436,5.83,306899.0],["ICX",0.01629,-12.65,298213.0],["TURBO",0.000943,13.65,295838.0],["NOT",0.000415,4.24,286664.0],["BABY",0.01195,7.66,274205.0],["HMSTR",0.000182,3.46,272678.0],["SPK",0.01535,6.75,270566.0],["NFT",0.0,-1.13,270534.0],["KAIA",0.02731,11.33,267329.0],["ZEN",4.483,7.07,259681.0],["SAHARA",0.007898,2.45,253555.0],["SSV",2.384,5.16,253050.0],["XCH",1.441,2.13,252966.0],["MEME",0.000514,5.68,250116.0],["YGG",0.02121,4.64,248055.0],["CARDS",0.1951,7.02,238932.0],["NES",0.2167,1.36,229955.0],["A",0.06952,5.33,223966.0],["XAMZN",260.71,-2.38,222765.0],["OFC",0.008811,0.24,222645.0],["DOOD",0.00128,4.66,221232.0],["ONE",0.000717,2.87,219613.0],["GOAT",0.01501,11.76,216507.0],["SENT",0.01264,2.6,216291.0],["SAND",0.04408,6.68,208045.0],["LAYER",0.06588,3.68,207985.0],["IMX",0.11,5.16,196014.0],["RVN",0.003035,6.6,194716.0],["PROS",0.4026,1.77,187642.0],["BAND",0.1686,4.53,179570.0],["RSR",0.001381,10.75,179427.0],["MAGIC",0.04356,4.41,179188.0],["IRYS",0.01394,2.05,177389.0],["RESOLV",0.01837,3.79,168547.0],["LINEA",0.002328,4.91,167134.0],["LRC",0.008108,2.0,166575.0],["MOVE",0.006583,5.63,164509.0],["API3",0.2129,4.67,163610.0],["SUSHI",0.1835,6.44,161914.0],["MINA",0.04677,9.4,161440.0],["KMNO",0.021,5.42,160244.0],["LSK",0.08442,1.36,155193.0],["YB",0.08851,14.65,153395.0],["BARD",0.1118,2.19,146249.0],["PYUSD",1.0002,0.02,144026.0],["ETHW",0.2709,-1.71,141784.0],["BLUR",0.01446,4.18,138290.0],["XSMCI",36.7,-0.54,137815.0],["DOGS",3.9e-05,6.56,134365.0],["CELO",0.0675,7.95,131984.0],["XDELL",434.74,-1.58,125959.0],["XARM",251.81,-0.62,123428.0],["XUSAR",17.25,-5.69,122349.0],["LPT",1.315,5.2,119222.0],["JITOSOL",114.41,4.18,118567.0],["ME",0.06527,7.94,118026.0],["WET",0.07547,5.17,116046.0],["PIXEL",0.005242,4.28,116032.0],["KSM",3.183,3.48,113424.0],["TOSHI",0.000114,7.71,113185.0],["MANA",0.07058,5.3,113084.0],["ASP",0.011452,3.64,113029.0],["AEVO",0.02306,7.06,112959.0],["CATI",0.04856,-0.47,112889.0],["BAT",0.06667,6.72,109981.0],["USDS",1.0001,-0.04,109057.0],["BRL1",0.1916,-0.62,109019.0],["GALFT",0.93,-0.33,107389.0],["AIXBT",0.0196,6.35,106553.0],["HUMA",0.02159,0.84,105927.0],["AGLD",0.1647,3.13,102927.0],["CVX",1.723,6.16,100429.0],["ANIME",0.002637,5.02,99933.0],["BABYDOGE",0.0,6.43,99413.0],["TNSR",0.03434,4.54,97802.0],["XXIAOMI",3.6,1.41,96715.0],["GRT",0.01508,7.87,95816.0],["S",0.02518,6.42,93521.0],["ZKJ",0.005352,0.34,93308.0],["STORJ",0.04045,-3.78,92850.0],["XBE",203.02,-2.46,92802.0],["YFI",2188.0,3.99,92766.0],["PARTI",0.02434,1.97,92672.0],["PROVE",0.1662,2.03,91821.0],["THETA",0.1628,8.32,89168.0],["VELO",0.003684,4.24,84364.0],["EGLD",2.976,4.49,83417.0],["METIS",2.605,6.2,81515.0],["ZORA",0.005392,7.05,79363.0],["USD1",0.9999,0.02,78705.0],["FLOW",0.02906,0.45,77490.0],["XCSCO",109.67,-1.24,77441.0],["CAT",2e-06,4.64,77413.0],["XTQQQ",70.85,-2.95,75688.0],["MASK",0.3971,5.11,75345.0],["ZIL",0.002541,3.97,74898.0],["DEGEN",0.001067,3.92,68192.0],["AUCTION",2.991,4.22,67722.0],["SAFE",0.09121,3.92,67421.0],["XAMAT",497.92,-0.81,66889.0],["DORA",0.00254,3.59,64226.0],["XAAOI",129.08,2.37,64068.0],["1INCH",0.08874,2.61,63318.0],["KITE",0.09909,2.85,60750.0],["WCT",0.0379,5.75,60048.0],["GMT",0.006672,4.02,58178.0],["PHA",0.02367,5.15,54849.0],["WIN",3.2e-05,2.76,54129.0],["CTC",0.07499,4.15,51875.0],["SKL",0.003665,6.11,49596.0],["PROMPT",0.02291,4.66,49317.0],["GMX",6.963,2.47,49296.0],["XPOPMART",18.81,-3.98,49068.0],["ZRX",0.08628,9.17,47599.0],["CETUS",0.02375,4.76,47552.0],["VELODROME",0.01999,9.18,46788.0],["RON",0.05392,7.5,46182.0],["SD",0.10274,5.31,41350.0],["UMA",0.3477,3.76,40976.0],["XBSP",39.89,-3.04,40689.0],["ENJ",0.02626,3.71,40490.0],["ZENT",0.001863,2.14,38613.0],["GLM",0.09785,7.07,37819.0],["SONIC",0.01972,5.34,36700.0],["ACH",0.004548,2.2,36381.0],["ZETA",0.03112,7.02,36175.0],["WOO",0.0116,5.17,35116.0],["XONDS",8.311,-6.91,33680.0],["IOST",0.000579,3.39,32403.0],["XGEV",966.11,-2.58,31264.0],["AUDM",0.7097,-0.03,30709.0],["BANANA",4.038,4.77,29794.0],["ARG",0.06757,-1.04,29213.0],["ASTR",0.004975,4.94,29159.0],["NMR",8.553,2.85,28180.0],["RPL",1.622,4.17,27703.0],["LEO",9.316,0.28,24832.0],["BREV",0.07003,3.81,24179.0],["DGB",0.004115,1.5,23684.0],["SOPH",0.003608,1.83,23313.0],["XIREN",42.73,-2.44,21888.0],["SWFTC",0.002425,5.3,21795.0],["OMI",0.000199,4.68,21626.0],["ZEUS",0.00238,0.98,21218.0],["LQTY",0.2029,3.05,21081.0],["ILV",3.204,3.96,21016.0],["XCOHR",290.86,-0.25,20908.0],["ORBS",0.005591,4.41,20378.0],["FLUID",1.2998,8.77,19847.0],["XASTS",65.48,-2.17,19814.0],["XGME",18.09,-0.28,19382.0],["SPURS",0.0587,2.43,19361.0],["XNFLX",80.05,-0.48,19237.0],["USAT",0.999,0.0,16111.0],["NAVX",0.007226,0.24,15582.0],["WAXP",0.003957,4.6,15220.0],["ELF",0.05828,0.95,14497.0],["XASML",1754.54,-1.08,14253.0],["SCR",0.0217,5.6,14018.0],["XRDDT",150.92,-1.57,14016.0],["XRIVN",15.96,1.27,12915.0],["CVC",0.01831,3.86,12880.0],["ID",0.03027,4.13,12412.0],["KNC",0.10887,2.63,11013.0],["TRA",0.215,-0.23,10805.0],["XWDC",471.05,0.34,9709.0],["XLLY",1246.73,-2.55,9653.0],["XSMH",564.43,0.32,9571.0],["XBX",141.53,-2.59,9039.0],["XSHAZ",60.62,-8.37,8675.0],["POR",0.0789,3.45,8360.0],["XKO",90.67,0.61,8353.0],["XIBM",233.77,-1.3,8253.0],["XAPP",311.56,-0.32,8043.0],["CITY",0.3625,1.83,7538.0],["JOE",0.02943,1.55,7117.0],["XADBE",272.1,-0.18,6864.0],["MENGO",0.01796,1.99,6646.0],["XLRCX",311.63,-0.51,5632.0],["XBOT",28.63,-1.41,5011.0],["XTTWO",240.2,0.55,4764.0],["SLP",0.000589,4.99,4333.0],["XOKTA",134.19,-6.22,4320.0],["XZM",106.71,-1.35,4257.0],["XCRWD",190.79,-4.56,4077.0],["T",0.003625,6.21,3671.0],["CELR",0.002096,3.76,3560.0],["XCIEN",393.19,-2.29,3532.0],["XAPLD",28.72,0.91,3188.0],["XVRT",266.74,1.0,2814.0],["XTER",384.44,0.82,2776.0],["XNOW",129.64,0.68,2221.0],["XALAB",291.77,-0.9,2110.0],["XISRG",376.24,-5.61,2103.0],["XUNH",384.19,-1.14,1853.0],["XON",75.35,-6.18,1696.0],["XIWM",298.2,-1.32,1655.0],["XXLE",63.87,0.58,1472.0],["XDKNG",25.1,-0.59,1275.0],["XCRM",207.33,0.62,1194.0],["BNT",0.3124,5.04,1010.0],["XHPE",53.11,-0.32,881.0],["XSNOW",320.02,-0.14,624.0],["XTWLO",222.24,0.11,373.0]];
+
+  // Tin tức thực tế đã nghiên cứu, chỉ gắn cho các coin có catalyst xác định — không suy đoán cho phần còn lại.
+  const NEWS_MAP = {
+    BTC: { signal:'bull', label:'Nghiêng tích cực (3/2)', rationale:'3 tin tích cực (cá voi gom, thanh khoản vĩ mô, quy định SEC), 2 tin tiêu cực (rủi ro Fed, biến động sau thanh lý).', items:[
+      {d:'bull', h:'Cá voi gom 2,9 tỷ USD BTC / 60 ngày', r:'Bloomberg: gom hàng ngay cả khi tâm lý còn "Sợ hãi".'},
+      {d:'bull', h:'Kho bạc Mỹ tăng gấp đôi mua lại TP dài hạn', r:'4 tỷ USD mua lại hạ lợi suất, nới lỏng tài chính cho tài sản rủi ro.'},
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Quy định gọi vốn crypto đầu tiên trong 90 năm của SEC.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'~37,6% khả năng tăng 0,25đ%, có thể siết thanh khoản.'},
+      {d:'bear', h:'3 tỷ USD lệnh short bị thanh lý / 24h', r:'Thanh lý hàng loạt thường kéo biến động hai chiều mạnh sau đó.'},
+    ]},
+    ETH: { signal:'mixed', label:'Trái chiều (2/2)', rationale:'Hưởng cùng lực đẩy pháp lý/vĩ mô như BTC, nhưng đang ở phía bị rút vốn trong đợt dịch chuyển ETF nội bộ.', items:[
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Cùng lực đẩy pháp lý như BTC.'},
+      {d:'bull', h:'Kho bạc Mỹ tăng mua lại TP dài hạn', r:'Thanh khoản nới lỏng chung.'},
+      {d:'bear', h:'ETF BTC+ETH mất 2,7 tỷ USD / 2 tuần', r:'Vốn rút trùng lúc dòng vốn chảy vào SOL/XRP.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'Rủi ro thắt chặt thanh khoản chung.'},
+    ]},
+    SOL: { signal:'bull', label:'Nghiêng tích cực (3/1)', rationale:'Nhận dòng vốn dịch chuyển từ BTC/ETH, cộng thêm nâng cấp kỹ thuật riêng.', items:[
+      {d:'bull', h:'Nâng cấp Alpenglow bắt đầu triển khai', r:'Rút thời gian xác nhận từ 12,8s xuống ~150ms.'},
+      {d:'bull', h:'ETF SOL nhận dòng vốn dịch chuyển', r:'Dòng vốn tổ chức xoay từ BTC/ETH sang SOL/XRP.'},
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Khung pháp lý rõ ràng hơn cho toàn ngành.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'Rủi ro thắt chặt thanh khoản chung.'},
+    ]},
+    AVAX: { signal:'bull', label:'Nghiêng tích cực (3/1)', rationale:'Mở rộng DeFi thực chất qua Aave, cộng lực đẩy pháp lý/vĩ mô chung.', items:[
+      {d:'bull', h:'Aave triển khai V4 + Stable Vaults', r:'Fintech dùng lợi suất stablecoin không cần tự xây hạ tầng.'},
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Khung pháp lý rõ ràng hơn cho toàn ngành.'},
+      {d:'bull', h:'Kho bạc Mỹ tăng mua lại TP dài hạn', r:'Thanh khoản nới lỏng chung.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'Rủi ro thắt chặt thanh khoản chung.'},
+    ]},
+    XRP: { signal:'mixed', label:'Trái chiều (2/2)', rationale:'Coin nhạy cảm nhất với đạo luật CLARITY — vướng mắc pháp lý riêng chưa giải quyết dù hưởng lực đẩy chung.', items:[
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Khung pháp lý rõ ràng hơn cho toàn ngành.'},
+      {d:'bull', h:'ETF XRP nhận một phần dòng vốn dịch chuyển', r:'Cùng xu hướng xoay vốn từ BTC/ETH như Solana.'},
+      {d:'bear', h:'Dòng vốn ETF tuần sụt 93%, còn ~1tr USD', r:'Từ 14,9tr USD tuần trước sụp mạnh.'},
+      {d:'bear', h:'Đạo luật CLARITY nghẽn ở Thượng viện, vote 15/9', r:'Trễ hạn 10/8, có thể lùi sang 2027.'},
+    ]},
+    LINK: { signal:'bull', label:'Nghiêng tích cực (3/1)', rationale:'Catalyst riêng cụ thể (hợp tác Bộ Thương mại Mỹ) hiếm thấy ở coin khác.', items:[
+      {d:'bull', h:'Đưa dữ liệu GDP/PCE của Bộ TM Mỹ lên on-chain', r:'Lần đầu dữ liệu kinh tế Mỹ công bố qua 10 blockchain nhờ Chainlink.'},
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Khung pháp lý rõ ràng hơn cho toàn ngành.'},
+      {d:'bull', h:'Kho bạc Mỹ tăng mua lại TP dài hạn', r:'Thanh khoản nới lỏng chung.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'Rủi ro thắt chặt thanh khoản chung.'},
+    ]},
+    ADA: { signal:'bull', label:'Nghiêng tích cực (2/1)', rationale:'Không catalyst riêng. Lưu ý: tuần trước ADA từng yếu nhất nhóm major (−10%) dù tin tức chung không tiêu cực.', items:[
+      {d:'bull', h:'SEC đề xuất "Regulation Crypto Assets"', r:'Khung pháp lý rõ ràng hơn cho toàn ngành.'},
+      {d:'bull', h:'Kho bạc Mỹ tăng mua lại TP dài hạn', r:'Thanh khoản nới lỏng chung.'},
+      {d:'bear', h:'Khả năng Fed tăng lãi suất 9/2026 tăng lên', r:'Rủi ro thắt chặt thanh khoản chung.'},
+    ]},
+    USDC: { signal:'none', label:'Không áp dụng — tài sản neo giá', rationale:'Rủi ro ở đây là tuân thủ/vận hành cho nhà phát hành, không phải yếu tố khiến giá "tăng/giảm".', items:[
+      {d:'neutral', h:'MiCA (EU) hết giai đoạn chuyển tiếp từ 1/7', r:'Tổ chức phục vụ khách EU không giấy phép MiCA nay vi phạm luật.'},
+      {d:'neutral', h:'Hàn Quốc/Nhật/Singapore siết luật stablecoin', r:'Hàn Quốc yêu cầu vốn tối thiểu 5 tỷ won, dự trữ >100%.'},
+    ]},
+    DOGE: { signal:'none', label:'Không có tín hiệu nổi bật', rationale:'Không tìm thấy tin tức đặc thù cho nhóm memecoin trong ngày.', items:[
+      {d:'neutral', h:'Nhóm memecoin đi ngang đến yếu trong tuần', r:'DOGE −0,9%, Pepe −11,5% trong tuần — không có catalyst riêng.'},
+    ]},
+    ONDO: { signal:'none', label:'Không có catalyst riêng trong 24h', rationale:'ONDO dẫn đầu mảng RWA/tokenized treasury (TVL ~3,78 tỷ USD, hợp tác BlackRock BUIDL qua OUSG) — nhưng đó là bối cảnh nền, không phải tin mới. Mức +3,24% hôm nay nhiều khả năng đi theo đà tăng chung của thị trường (BTC phá đỉnh) hơn là tin riêng.', items:[
+      {d:'neutral', h:'Không tìm thấy tin xúc tác riêng trong 24h qua', r:'Biến động giá có thể chỉ phản ánh đà tăng chung toàn thị trường, không phải catalyst đặc thù cho ONDO.'},
+    ]},
+    HYPE: { signal:'bull', label:'Nghiêng tích cực', rationale:'Cấu trúc kỹ thuật bullish (trên EMA 50/100/200), đang chuyển hướng sang RWA — dự báo 75% volume sàn đến từ RWA vào 2027.', items:[
+      {d:'bull', h:'Đang test kháng cự $60, xu hướng kỹ thuật tích cực', r:'Giao dịch trên cả 3 đường EMA 50/100/200 ngày, cấu trúc bullish.'},
+      {d:'bull', h:'Đốt token luỹ kế đạt 4,73% tổng cung', r:'47,27 triệu HYPE đã bị đốt trên tổng cung 1 tỷ.'},
+      {d:'bull', h:'Chuyển hướng chiến lược sang tokenized RWA', r:'Dự báo 75% volume sàn đến từ RWA vào 2027, tăng từ 52% giữa 2026.'},
+    ]},
+    PUMP: { signal:'mixed', label:'Trái chiều', rationale:'Đà tăng kỹ thuật mạnh (+91% trong 30 ngày) nhưng đối mặt áp lực mở khoá token lớn.', items:[
+      {d:'bull', h:'Tăng 9% ngày 17/8, hình thành mẫu hình kỹ thuật bullish', r:'Lần đầu xuất hiện mẫu hình này; tăng 31,9%/7 ngày, +91%/30 ngày.'},
+      {d:'bull', h:'Phí giao dịch tuần vượt 10 triệu USD lần đầu', r:'Tuần 3-9/8 đạt 10,03 triệu USD phí — mô hình doanh thu chia 50/50 buyback.'},
+      {d:'bear', h:'Mở khoá 6,875 tỷ token vào 12/8', r:'Tiếp theo đợt mở khoá 82,5 tỷ token hồi tháng 7 — áp lực bán tiềm ẩn.'},
+    ]},
+    ZEC: { signal:'mixed', label:'Trái chiều', rationale:'Câu chuyện privacy coin mạnh lên (SEC không hành động, Grayscale nộp hồ sơ ETF) nhưng cá voi đang chốt lời.', items:[
+      {d:'bull', h:'SEC không hành động với Zcash, Grayscale nộp hồ sơ ETF ZEC', r:'Củng cố câu chuyện privacy coin; quyết định ETF dự kiến cuối 2026.'},
+      {d:'bull', h:'Công ty niêm yết Nasdaq kích hoạt mining ZEC lớn nhất thế giới', r:'Được hậu thuẫn bởi Winklevoss Capital.'},
+      {d:'bear', h:'Áp lực bán từ cá voi (317 bán / 208 mua)', r:'Cá voi tận dụng đà tăng giá để chốt lời, tạo kháng cự.'},
+    ]},
+    PEPE: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Giảm ~8,3% trong 7 ngày qua, không có catalyst tích cực rõ ràng được tìm thấy.', items:[
+      {d:'bear', h:'Giảm 8,31% trong 7 ngày qua', r:'Không tìm thấy tin tức xúc tác tiêu cực cụ thể — có thể là chốt lời sau đà tăng trước đó.'},
+    ]},
+    SUI: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nhiều tiến triển hạ tầng: cầu nối BTC DeFi, cho vay tổ chức, bảo mật hậu lượng tử.', items:[
+      {d:'bull', h:'Hashi Bridge vượt 1,1 triệu BTC deposit', r:'Cho thấy quan tâm tổ chức lớn với BTC DeFi trên testnet Sui.'},
+      {d:'bull', h:'NAVI Protocol ra mắt cho vay tổ chức', r:'Vault rủi ro tách biệt để thu hút vốn chuyên nghiệp.'},
+      {d:'bull', h:'Thêm 2 chuẩn ký số hậu lượng tử (NIST)', r:'Cho phép tài khoản chuyển sang khoá an toàn hậu lượng tử.'},
+    ]},
+    OKB: { signal:'bull', label:'Nghiêng tích cực', rationale:'Định vị lại thành hạ tầng Web3 cốt lõi qua X Layer, không chỉ là token tiện ích sàn.', items:[
+      {d:'bull', h:'+6,5% trong 24h, vốn hoá 2,29 tỷ USD', r:'Tăng giá đi kèm định vị lại vai trò token.'},
+      {d:'bull', h:'Trở thành gas token của mạng X Layer', r:'Cầu nối giữa hệ thống giao dịch OKX và hệ sinh thái on-chain.'},
+    ]},
+    BNB: { signal:'mixed', label:'Trái chiều', rationale:'Nâng cấp mạng và chứng nhận bảo mật tích cực, nhưng có báo cáo về rủi ro bảo mật lớn.', items:[
+      {d:'bull', h:'Nâng cấp BNB Smart Chain ngày 25/8', r:'Cải thiện tốc độ giao dịch, finality, khả năng mở rộng, hỗ trợ AI agent/RWA.'},
+      {d:'bull', h:'Đạt chứng nhận ISO 27001 và 27701', r:'Tăng uy tín với nhà đầu tư tổ chức.'},
+      {d:'bear', h:'Nghiên cứu USENIX: 65.000 địa chỉ rủi ro, thiệt hại ~580tr USD', r:'Liên quan đến Ethereum và BNB Chain.'},
+    ]},
+    WLD: { signal:'mixed', label:'Trái chiều', rationale:'Giảm phát cung tích cực và quan tâm tổ chức, nhưng đang trong downtrend kỹ thuật và có cảnh báo về việc AI agent không dùng public chain.', items:[
+      {d:'bull', h:'Cắt giảm 43% tốc độ mở khoá token hàng ngày', r:'Từ ~5,1 triệu xuống ~2,9 triệu token/ngày từ 24/7.'},
+      {d:'bull', h:'Eightco Holdings nắm ~302 triệu WLD (~96tr USD)', r:'Tương đương 8,4% cung lưu hành — quan tâm tổ chức đáng kể.'},
+      {d:'bear', h:'Báo cáo Fidelity: AI agent có thể không dùng public chain như WLD', r:'Đang test phá vỡ downtrend nhiều tuần, chưa rõ kết quả.'},
+    ]},
+    TRUMP: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Rủi ro pháp lý/uy tín lớn: thượng nghị sĩ yêu cầu điều tra, nhà đầu tư thiệt hại nặng.', items:[
+      {d:'bear', h:'Thượng nghị sĩ Warren, Blumenthal yêu cầu SEC điều tra', r:'Nghi vấn đây có phải lừa đảo và xung đột lợi ích khi đương nhiệm.'},
+      {d:'bear', h:'~1 triệu nhà đầu tư lỗ tổng 3,81 tỷ USD (tính đến 6/2026)', r:'Dữ liệu on-chain cho thấy thiệt hại lớn cho nhà đầu tư nhỏ lẻ.'},
+    ]},
+    FIL: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Giá gần đáy lịch sử, dù có đề xuất cải tổ tokenomics đang chờ thông qua.', items:[
+      {d:'bear', h:'Giá gần mức thấp lịch sử (31/7)', r:'Dự báo có thể giảm tiếp về ~0,594 USD trong tháng 8.'},
+      {d:'bull', h:'Đề xuất quản trị "Solstice" tái cơ cấu phần thưởng khối', r:'Hướng phần thưởng theo mức sử dụng lưu trữ thực tế — chưa được thông qua.'},
+    ]},
+    UNI: { signal:'bull', label:'Nghiêng tích cực', rationale:'Mở rộng sang Avalanche, dẫn đầu thị phần DEX, ra mắt sản phẩm lợi suất mới.', items:[
+      {d:'bull', h:'Triển khai hệ thống đấu giá token lên Avalanche', r:'Cho phép bán token on-chain và tạo thanh khoản tự động.'},
+      {d:'bull', h:'DEX chiếm kỷ lục 19,5% khối lượng giao dịch giao ngay (11/8)', r:'Uniswap dẫn đầu với 53,4 tỷ USD.'},
+      {d:'bull', h:'Uniswap Labs ra mắt sản phẩm "Earn"', r:'Định tuyến tiền gửi người dùng vào vault Morpho được chọn lọc.'},
+    ]},
+    ENA: { signal:'bull', label:'Nghiêng tích cực', rationale:'Doanh thu protocol tăng mạnh, được xem là ứng viên altseason hàng đầu, có giao dịch mua lớn từ nhà đầu tư tên tuổi.', items:[
+      {d:'bull', h:'Arthur Hayes mua ~248 nghìn USD ENA (1/8)', r:'Tín hiệu niềm tin từ nhà đầu tư có tiếng.'},
+      {d:'bull', h:'Doanh thu protocol đạt ~61 triệu USD trong tháng 8', r:'Mô hình đô la tổng hợp tạo dòng tiền thực tế đáng kể.'},
+    ]},
+    XLM: { signal:'bull', label:'Nghiêng tích cực', rationale:'Hưởng lợi từ thanh khoản vĩ mô chung, mảng RWA tăng trưởng, sắp có nâng cấp giao thức.', items:[
+      {d:'bull', h:'Tăng 12,6% trong ngày 20/8 nhờ thanh khoản từ Kho bạc Mỹ', r:'Cùng đợt short squeeze toàn thị trường.'},
+      {d:'bull', h:'Giá trị thị trường RWA trên Stellar đạt 3,25 tỷ USD (19/8)', r:'Mảng RWA tiếp tục tăng trưởng.'},
+      {d:'bull', h:'Đề xuất nâng cấp Protocol 28', r:'Cải thiện khả năng đồng thuận và hiệu suất hợp đồng thông minh, dự kiến 8-9/2026.'},
+    ]},
+    TRX: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Tích hợp với PayPal PYUSD — mở rộng use-case thực tế cho mạng.', items:[
+      {d:'bull', h:'PayPal hỗ trợ PYUSD phiên bản permissionless trên TRON', r:'Cùng với Avalanche và các chain khác — tích hợp thanh toán thực tế.'},
+    ]},
+    MON: { signal:'mixed', label:'Trái chiều', rationale:'TVL DeFi tăng mạnh nhưng lực mua giao ngay yếu, rủi ro mở khoá lớn cuối năm.', items:[
+      {d:'bull', h:'TVL DeFi kỷ lục đổ vào hệ sinh thái Monad (11/8)', r:'Tuy nhiên lực mua giao ngay cho token gốc vẫn yếu.'},
+      {d:'bull', h:'AI agent "Fello 2" ra mắt với phần thưởng MON', r:'Tự động hoá chiến lược DeFi, phân phối phí bằng MON.'},
+      {d:'bear', h:'Mở khoá token lớn vào 24/11/2026', r:'Lượng cung mới đáng kể sắp về — rủi ro pha loãng dài hạn.'},
+    ]},
+    PENGU: { signal:'mixed', label:'Trái chiều', rationale:'Mở rộng thương hiệu thực tế mạnh (bán lẻ, đối tác sàn) nhưng đi kèm mở khoá token bổ sung cung.', items:[
+      {d:'bull', h:'Ra mắt series truyện tranh vật lý kèm vật phẩm số (2/8)', r:'Mở rộng thương hiệu sang sản phẩm vật lý.'},
+      {d:'bull', h:'Hợp tác chiến lược với sàn LBank (6/8)', r:'Mở rộng tiếp cận thị trường.'},
+      {d:'bear', h:'Mở khoá token thêm ~4 triệu USD cung (đầu 8/8)', r:'Trùng thời điểm ra mắt sản phẩm mới — áp lực cung nhẹ.'},
+    ]},
+  };
+  Object.assign(NEWS_MAP, {
+    LTC: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nhiều tiến triển kỹ thuật và mở rộng DeFi, chưa thấy tin tiêu cực đáng kể.', items:[
+      {d:'bull', h:'cbLTC (Litecoin wrap trên Coinbase Base) vượt 81.000 LTC', r:'Mở rộng tiếp cận DeFi cho Litecoin qua mạng Base.'},
+      {d:'bull', h:'Bản vá bảo trì MWEB quan trọng (2/8)', r:'Củng cố xác thực cho giao dịch lớp riêng tư.'},
+      {d:'bull', h:'LitecoinVM đang phát triển — thêm khả năng smart contract', r:'Catalyst tăng trưởng dài hạn.'},
+    ]},
+    NEAR: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nhiều sản phẩm mới ra mắt (AI staking, perpetual trading, bảo mật hậu lượng tử) trong cùng tuần.', items:[
+      {d:'bull', h:'Ra mắt 2 mô hình staking hướng AI (IronClaw, NEAR AI)', r:'Chuyển đổi cam kết thành tín dụng hosting/suy luận AI bảo mật.'},
+      {d:'bull', h:'Ra mắt giao dịch perpetual đòn bẩy 40x trên 50+ thị trường', r:'Mở rộng sản phẩm giao dịch phái sinh.'},
+      {d:'bull', h:'Kích hoạt tài khoản an toàn hậu lượng tử', r:'Áp dụng chữ ký hậu lượng tử chuẩn NIST.'},
+    ]},
+    ARB: { signal:'mixed', label:'Trái chiều', rationale:'Nâng cấp lớn tích cực nhưng đi kèm mở khoá token và giá giảm 30 ngày.', items:[
+      {d:'bull', h:'Nâng cấp ArbOS 61 "Elara" kích hoạt 20/8', r:'Định giá gas đa chiều, tăng giới hạn hợp đồng Stylus.'},
+      {d:'bear', h:'Mở khoá ~92,65 triệu ARB (16/8)', r:'Thêm ~1,6% cung lưu hành, giá giảm 15,82% trong 30 ngày.'},
+    ]},
+    AAVE: { signal:'bull', label:'Nghiêng tích cực', rationale:'V4 mở rộng đa chuỗi thành công, dẫn đầu mảng vàng tokenized, giá vượt trội so với thị trường chung.', items:[
+      {d:'bull', h:'Aave V4 lên mainnet trên Arbitrum (17/8)', r:'Cột mốc mở rộng đa chuỗi mới.'},
+      {d:'bull', h:'V4 nắm >50% vàng tokenized hoá trong DeFi', r:'Vị thế dẫn đầu rõ rệt trong mảng này.'},
+      {d:'bull', h:'Giá tăng ~20%/tuần khi thị trường chung giảm', r:'Hiệu suất vượt trội so với thị trường chung.'},
+    ]},
+    SHIB: { signal:'mixed', label:'Trái chiều', rationale:'Đà tăng 28% bị chặn lại bởi bên bán; các dự án phụ (Metaverse, LEASH v2, FHE) vẫn đang phát triển nhưng chưa ra mắt.', items:[
+      {d:'bull', h:'Tăng 28% tuần trước khi bị chặn ở kháng cự', r:'Đà tăng dừng lại, chưa phá được ngưỡng $0,00000548.'},
+      {d:'bull', h:'LEASH v2 dự kiến cố định tổng cung + quản trị DAO', r:'Vẫn đang phát triển, chưa có ngày ra mắt chính thức.'},
+      {d:'bear', h:'Cảnh báo lừa đảo giả mạo "di dời token" trong Telegram', r:'Không phải rủi ro về giá nhưng cần lưu ý về an toàn cộng đồng.'},
+    ]},
+    DOT: { signal:'mixed', label:'Trái chiều', rationale:'Grayscale rút hồ sơ ETF ngay trước hạn quyết định của SEC — mất một catalyst tổ chức quan trọng, dù hoạt động mạng tăng vọt.', items:[
+      {d:'bear', h:'Grayscale rút hồ sơ ETF DOT giao ngay (7/8)', r:'Rút ngay trước hạn quyết định của SEC — mất catalyst tổ chức.'},
+      {d:'bull', h:'Giao dịch mạng tăng vọt 17.200% (18/8)', r:'Từ 6 lên 1.456 giao dịch/ngày — tín hiệu động lực nhà phát triển.'},
+      {d:'bear', h:'Giá giảm ~13% từ đỉnh tháng 8, dưới $0,77', r:'Cần lấy lại $0,79 mới cải thiện triển vọng kỹ thuật.'},
+    ]},
+    ICP: { signal:'bull', label:'Nghiêng tích cực', rationale:'AI Caffeine tạo code tự động, hạ tầng GPU mới, giữ vị trí blockchain nhanh thứ 2.', items:[
+      {d:'bull', h:'AI Caffeine của Dfinity tạo 15 tỷ dòng code Motoko', r:'Tăng tốc triển khai ứng dụng tự động on-chain.'},
+      {d:'bull', h:'Chuyển sang hạ tầng GPU gốc cho mô hình AI', r:'Hỗ trợ mô hình AI chủ quyền chạy on-chain.'},
+      {d:'bull', h:'Xử lý 1.386 TPS, nhanh thứ 2 sau Solana', r:'Vị thế kỹ thuật vẫn dẫn đầu nhóm.'},
+    ]},
+    CRV: { signal:'bull', label:'Nghiêng tích cực', rationale:'Đà tăng kỹ thuật mạnh cộng với giảm phát cung sắp diễn ra.', items:[
+      {d:'bull', h:'Giá tăng 34% trong tuần, phá xu hướng giảm dài hạn', r:'Đang tiến gần kháng cự quan trọng $0,29-0,30.'},
+      {d:'bull', h:'Giảm phát hành hàng năm ~15% sắp kích hoạt', r:'Hạ tỷ lệ lạm phát token xuống 4,02%.'},
+      {d:'bull', h:'Llamalend V2 lên mainnet Ethereum', r:'Lãi suất vay crvUSD giảm gần 2/3.'},
+    ]},
+    HBAR: { signal:'bull', label:'Nghiêng tích cực', rationale:'Kỷ lục giao dịch mạng, đối tác Mastercard, ETF chưa từng bị rút vốn ròng.', items:[
+      {d:'bull', h:'Kỷ lục giao dịch mạng — TB 291.200 giao dịch/ngày (2 tuần)', r:'Tín hiệu áp dụng doanh nghiệp mạnh.'},
+      {d:'bull', h:'Gia nhập chương trình Crypto Partner của Mastercard', r:'Dùng cho giao dịch B2B, chuyển tiền xuyên biên giới.'},
+      {d:'bull', h:'ETF Hedera của Canary chưa từng có tuần rút vốn ròng', r:'Nhu cầu tổ chức ổn định kể từ khi ra mắt.'},
+    ]},
+    WIF: { signal:'bull', label:'Nghiêng tích cực', rationale:'Được đánh giá là memecoin đáng chú ý, hưởng lợi từ hệ sinh thái Solana.', items:[
+      {d:'bull', h:'Mẫu hình kỹ thuật bullish trên khung tuần', r:'Cho thấy động lực mua mạnh sau 2 tuần điều chỉnh đi ngang.'},
+      {d:'bull', h:'Tăng 5,2%/tuần, volume ~21,5 triệu USD/ngày', r:'Được nêu tên là memecoin đáng chú ý nhờ hệ sinh thái Solana.'},
+    ]},
+    ETC: { signal:'bull', label:'Nghiêng tích cực', rationale:'Cắt giảm phát hành (giảm phát) và mở rộng khả năng tiếp cận giao dịch.', items:[
+      {d:'bull', h:'Hoàn thành "Fifthening" — cắt phần thưởng khối (14/8)', r:'Giảm phát hành hàng ngày, tạo áp lực giảm phát.'},
+      {d:'bull', h:'Có quyền truy cập giao dịch chéo chuỗi qua SolCex (13/8)', r:'Mở rộng kênh giao dịch.'},
+    ]},
+    TAO: { signal:'bull', label:'Nghiêng tích cực', rationale:'Quan tâm tổ chức tăng, cơ chế phân bổ phần thưởng hiệu quả hơn, số lượng holder tăng.', items:[
+      {d:'bull', h:'Nhà đầu tư Jason Calacanis khuyên bán nửa BTC mua TAO/SOL', r:'Đánh giá cao các dự án "sản xuất" như Bittensor.'},
+      {d:'bull', h:'Nâng cấp V440 thêm cơ chế "Emission Gate"', r:'Tập trung phần thưởng vào subnet nhu cầu cao, giảm slot nhàn rỗi.'},
+      {d:'bull', h:'Số lượng holder tăng từ 1,5K lên 1,84K (2/7 → 30/7)', r:'Cho thấy tích luỹ âm thầm trong giai đoạn đi ngang.'},
+    ]},
+    CRO: { signal:'mixed', label:'Trái chiều', rationale:'Mất một đối tác lớn nhưng có khoản đầu tư tổ chức đáng kể và mở rộng use-case thanh toán.', items:[
+      {d:'bear', h:'Công ty truyền thông của Trump huỷ thoả thuận với Crypto.com', r:'Kế hoạch tích hợp kho bạc CRO trị giá hàng tỷ USD bị huỷ (7/8).'},
+      {d:'bull', h:'Citadel Securities đầu tư 400 triệu USD vào Crypto.com', r:'Định giá công ty ở mức 20 tỷ USD.'},
+      {d:'bull', h:'Emirates cho phép thanh toán vé máy bay qua Crypto.com', r:'Mở rộng use-case thanh toán thực tế tại UAE.'},
+    ]},
+    OP: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Giá chạm đáy lịch sử, mất đối tác lớn (Base), và quyết định gây tranh cãi về phân bổ token.', items:[
+      {d:'bear', h:'Giá chạm đáy lịch sử ~$0,082 (đầu tháng 8)', r:'Tiếp tục giao dịch quanh vùng này.'},
+      {d:'bear', h:'Base rời khỏi OP Stack (từ tháng 2/2026)', r:'Mất một trong những đối tác lớn nhất hệ sinh thái.'},
+      {d:'bear', h:'Foundation chuyển 546,9 triệu OP từ airdrop người dùng sang quỹ riêng', r:'Quyết định gây tranh cãi, giảm phân bổ cho người dùng (20/8).'},
+    ]},
+    APT: { signal:'mixed', label:'Trái chiều', rationale:'Tính năng bảo mật mới ra mắt nhưng đối tác DeFi rút lui và áp lực bán từ mở khoá token.', items:[
+      {d:'bull', h:'Ra mắt "Confidential APT" — lớp riêng tư tuỳ chọn', r:'Ẩn số dư/số tiền giao dịch bằng zero-knowledge proof.'},
+      {d:'bear', h:'Aave thu hẹp triển khai trên Aptos', r:'Tăng bất định cho hoạt động DeFi trên mạng.'},
+      {d:'bear', h:'Mở khoá token lớn + thị trường risk-off khiến giá giảm 3-4%', r:'Áp lực bán gia tăng.'},
+    ]},
+    INJ: { signal:'bull', label:'Nghiêng tích cực', rationale:'Đạt tư cách pháp lý quan trọng với SEC, tích hợp mở rộng mạnh, hoạt động phát triển dẫn đầu nhóm L1.', items:[
+      {d:'bull', h:'Trở thành transfer agent đăng ký với SEC', r:'Cột mốc pháp lý quan trọng cho mảng tokenization, giá tăng ~9%.'},
+      {d:'bull', h:'Kết nối 60+ blockchain qua tích hợp LI.FI (12/8)', r:'Tăng khả năng tiếp cận thanh khoản và người dùng.'},
+      {d:'bull', h:'354 commit trong 7 ngày — cao nhất nhóm L1 theo dõi', r:'Hoạt động phát triển mạnh mẽ.'},
+    ]},
+  });
+  Object.assign(NEWS_MAP, {
+    RENDER: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Giá giảm ~89% từ đỉnh lịch sử (3/2024); cải tiến gần đây chủ yếu là kỹ thuật hạ tầng, chưa thấy catalyst đủ mạnh để đảo chiều.', items:[
+      {d:'bear', h:'Giao dịch quanh $1,40, giảm ~89% so với đỉnh $13,53', r:'Chưa có dấu hiệu phục hồi mạnh.'},
+      {d:'bull', h:'Cải tiến tốc độ build (giảm 40%), thêm xác thực OIDC cho Anthropic/OpenAI', r:'Nâng cấp kỹ thuật hạ tầng, không phải catalyst giá trực tiếp.'},
+    ]},
+    JUP: { signal:'mixed', label:'Trái chiều', rationale:'DAO cắt giảm phát hành mới (giảm pha loãng) nhưng cũng cắt giảm airdrop cộng đồng gây tranh cãi.', items:[
+      {d:'bull', h:'DAO quyết định giảm phát hành JUP mới, ưu tiên staker', r:'Giảm áp lực pha loãng so với airdrop lớn một lần.'},
+      {d:'bear', h:'Cắt giảm 71% airdrop Jupuary 2026', r:'Quyết định gây tranh cãi trong cộng đồng.'},
+    ]},
+    ALGO: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nâng cấp bảo mật hậu lượng tử thông qua, đối tác thanh khoản tổ chức, tăng giá đáng kể.', items:[
+      {d:'bull', h:'Nâng cấp đồng thuận v5.0.0 (bảo mật hậu lượng tử) qua vòng quản trị cuối', r:'Đứng trong top 4 blockchain phi tập trung nhất toàn cầu.'},
+      {d:'bull', h:'Đối tác với Flow Traders cho giao dịch tổ chức 24/7', r:'Tăng 14%/7 ngày nhờ đối tác thanh khoản và kỷ lục validator.'},
+    ]},
+    GALA: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Mở rộng tài sản giao dịch trên GalaSwap, volume giao dịch cao trong nhóm play-to-earn.', items:[
+      {d:'bull', h:'GalaSwap thêm 4 tài sản mới (SAND, ETHFI, ICNT, WKAS)', r:'Mở rộng lựa chọn giao dịch trên nền tảng.'},
+      {d:'bull', h:'Volume giao dịch 24h cao nhất nhóm play-to-earn được so sánh', r:'18,96 triệu USD trong 24h.'},
+    ]},
+    COMP: { signal:'bull', label:'Nghiêng tích cực', rationale:'Chương trình phát triển lớn nhất lịch sử protocol, hướng tới tín dụng tổ chức on-chain.', items:[
+      {d:'bull', h:'Công bố chương trình 52 triệu USD cho tín dụng on-chain (17/8)', r:'Chương trình DAO lớn nhất từ trước đến nay, hỗ trợ RWA và hiệu quả vốn.'},
+    ]},
+    PENDLE: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nhiều sản phẩm mới ra mắt liên tục trong tháng, hợp tác với Chainlink và Wintermute.', items:[
+      {d:'bull', h:'Ra mắt oracle rủi ro tự động đầu tiên dựa trên Chainlink CRE (12/8)', r:'Mang quản lý rủi ro thời gian thực cho Aave.'},
+      {d:'bull', h:'Vault USDC hệ sinh thái mới với Wintermute Armitage (12/8)', r:'Định tuyến USDC vào thị trường PT, chia thưởng PENDLE hàng tuần.'},
+    ]},
+    DYDX: { signal:'mixed', label:'Trái chiều', rationale:'Nâng cấp giao thức ổn định nhưng đang xem xét đóng nhiều thị trường token nhỏ.', items:[
+      {d:'bull', h:'Hoàn thành nâng cấp giao thức v8.2 (7/2026)', r:'Cải thiện hiệu suất và ổn định cho validator.'},
+      {d:'bear', h:'Vote đóng nhiều thị trường token (AXS, BERA, FLOKI...)', r:'Thu hẹp phạm vi sản phẩm giao dịch trên nền tảng.'},
+    ]},
+    STX: { signal:'bull', label:'Nghiêng tích cực', rationale:'Sản phẩm restaking mới, catalyst Genesis Bond sắp tới, chương trình thưởng BTC.', items:[
+      {d:'bull', h:'Restaking STX trực tiếp trong ví Leather (9/8)', r:'Đơn giản hoá tham gia trước chu kỳ thưởng tiếp theo.'},
+      {d:'bull', h:'Chương trình DeFi 90 ngày với Zest Protocol, thưởng 1 BTC/tháng', r:'Bắt đầu khoảng 19/9/2026.'},
+    ]},
+    ATOM: { signal:'bull', label:'Nghiêng tích cực', rationale:'Chuyển đổi tokenomics sang mô hình giảm phát, đối tác tổ chức mới, đà tăng kỹ thuật mạnh.', items:[
+      {d:'bull', h:'Chuyển từ mô hình lạm phát không giới hạn sang buyback + đốt token', r:'Cải tổ tokenomics cơ bản trong tháng 8.'},
+      {d:'bull', h:'Tăng 11% nhờ short squeeze, thanh lý 1,28 triệu USD lệnh bán khống (17/8)', r:'Tâm lý thị trường xoay sang tích cực.'},
+      {d:'bull', h:'Đối tác với Zeeve cho triển khai tài sản tokenized hoá', r:'Nhắm tới tổ chức tài chính.'},
+    ]},
+    APE: { signal:'mixed', label:'Trái chiều', rationale:'Giá tiếp tục giảm mạnh nhưng có cải tổ hạ tầng thanh khoản đáng chú ý.', items:[
+      {d:'bear', h:'Giá quanh $0,13, giảm mạnh so với trước', r:'Cộng đồng thừa nhận đà giảm giá nghiêm trọng.'},
+      {d:'bull', h:'ApeChain chuyển sang dùng USDC thay vì apeUSD (31/7)', r:'Tăng thanh khoản và đơn giản hoá tiếp cận stablecoin.'},
+    ]},
+    AXS: { signal:'bull', label:'Nghiêng tích cực', rationale:'Phá vỡ xu hướng giảm nhiều năm, có game mới và MMO sắp ra mắt.', items:[
+      {d:'bull', h:'Phá vỡ mẫu hình downtrend nhiều năm với volume tăng', r:'Được giới trader kỹ thuật chú ý trở lại.'},
+      {d:'bull', h:'MMO Atia Legacy tích hợp Axie NFT sắp ra mắt trong 2026', r:'Kỳ vọng hồi sinh sự tham gia của người chơi.'},
+    ]},
+    SNX: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'3 sàn lớn nhất Hàn Quốc đưa vào diện xem xét huỷ niêm yết — rủi ro đáng kể dù giá phục hồi kỹ thuật ngắn hạn.', items:[
+      {d:'bear', h:'Upbit, Bithumb, Coinone đưa SNX vào diện xem xét delist (7/8)', r:'Lo ngại về quản trị, tokenomics không rõ ràng, thiếu tiến triển kinh doanh.'},
+      {d:'bull', h:'Giá tăng 7,1% trong ngày 20/8', r:'Phục hồi kỹ thuật ngắn hạn, chưa rõ bền vững.'},
+    ]},
+    PYTH: { signal:'mixed', label:'Trái chiều', rationale:'Xu hướng giá 30 ngày âm và có mở khoá token, nhưng nâng cấp chuyển sang mô hình trả phí có thể tăng doanh thu dài hạn.', items:[
+      {d:'bear', h:'Giảm 8,52% trong 30 ngày qua', r:'Xu hướng giá tiêu cực gần đây.'},
+      {d:'bear', h:'Mở khoá token theo lịch vào 20/8', r:'Thêm cung lưu hành.'},
+      {d:'bull', h:'Nâng cấp "Pyth Core" chuyển API sang mô hình trả phí (26/8)', r:'Doanh thu hướng tới mua lại token.'},
+    ]},
+    TIA: { signal:'mixed', label:'Trái chiều', rationale:'Được đánh giá là token hạ tầng modular tiềm năng nhưng nhu cầu sử dụng thực tế còn thấp.', items:[
+      {d:'bull', h:'Được nêu tên là token vốn hoá thấp dẫn đầu tháng 8', r:'Vai trò hạ tầng dữ liệu modular cho rollup được đánh giá cao.'},
+      {d:'bear', h:'Phí và mức sử dụng on-chain hiện tại còn thấp', r:'Đặt câu hỏi về nhu cầu ngắn hạn dù nâng cấp Fibre nhắm tới tăng 100x công suất.'},
+    ]},
+    SEI: { signal:'bull', label:'Nghiêng tích cực', rationale:'Tăng giá tuần + ngày, nâng cấp kỹ thuật lớn và tích hợp cổ phiếu tokenized sắp tới.', items:[
+      {d:'bull', h:'Tăng 8%/24h, 5,5%/tuần', r:'Đà tăng giá đồng thời ngắn và trung hạn.'},
+      {d:'bull', h:'"Giga Upgrade" nhắm 200.000+ TPS, finality dưới 400ms', r:'Triển khai theo giai đoạn từ cuối 2026.'},
+      {d:'bull', h:'Tích hợp Dinari để cung cấp cổ phiếu Mỹ tokenized hoá', r:'Mở rộng use-case tài sản thực.'},
+    ]},
+    IMX: { signal:'mixed', label:'Trái chiều', rationale:'Giá giảm mạnh, quá bán về kỹ thuật, nhưng số lượng holder vẫn tăng và có tái cấu trúc hệ sinh thái.', items:[
+      {d:'bear', h:'Giá phá vỡ vùng hỗ trợ $0,125-0,130, RSI quá bán (24)', r:'Áp lực bán mạnh trên khung 4 giờ.'},
+      {d:'bull', h:'Hợp nhất các chuỗi, ra mắt gaming hub mới', r:'Giải quyết phân mảnh hệ sinh thái.'},
+      {d:'bull', h:'Số lượng holder tăng từ 98.000 lên 98.560 trong 30 ngày', r:'Cho thấy tích luỹ âm thầm dù giá giảm.'},
+    ]},
+  });
+  NEWS_MAP.XAUT = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Tether Gold trong đợt tra cứu này — tài sản neo giá theo vàng vật chất.', items:[
+    {d:'neutral', h:'Không có tin xúc tác được tìm thấy', r:'Cần tra cứu thêm nếu cần thông tin cụ thể hơn.'},
+  ]};
+  NEWS_MAP.BCH = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Bitcoin Cash trong đợt tra cứu này.', items:[
+    {d:'neutral', h:'Không có tin xúc tác được tìm thấy', r:'Cần tra cứu thêm nếu cần thông tin cụ thể hơn.'},
+  ]};
+  NEWS_MAP.ORDI = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Ordinals trong đợt tra cứu này.', items:[
+    {d:'neutral', h:'Không có tin xúc tác được tìm thấy', r:'Cần tra cứu thêm nếu cần thông tin cụ thể hơn.'},
+  ]};
+  NEWS_MAP.USDT = NEWS_MAP.USDG = NEWS_MAP.RLUSD = NEWS_MAP.PYUSD = NEWS_MAP.USDS = NEWS_MAP.USD1 = NEWS_MAP.USDC;
+
+  function fmtPrice(v){
+    if(v >= 1000) return v.toLocaleString('en-US',{maximumFractionDigits:0});
+    if(v >= 1) return v.toLocaleString('en-US',{maximumFractionDigits:2});
+    if(v >= 0.01) return v.toLocaleString('en-US',{maximumFractionDigits:4});
+    return v.toExponential(2);
+  }
+  function fmtVol(v){
+    if(v >= 1e9) return (v/1e9).toFixed(2)+'B';
+    if(v >= 1e6) return (v/1e6).toFixed(2)+'M';
+    if(v >= 1e3) return (v/1e3).toFixed(1)+'K';
+    return v.toFixed(0);
+  }
+
+  let sortKey = 'vol', sortDir = -1, filterText = '', newsOnly = false;
+  const marketBody = document.getElementById('marketBody');
+  const marketCount = document.getElementById('marketCount');
+  const keyIdx = {sym:0, px:1, chg:2, vol:3};
+  const SORTABLE = ['sym','px','chg','vol'];
+
+  const SIGNAL_LABEL = {bull:'signal bull', bear:'signal bear', mixed:'signal mixed', none:'signal none'};
+
+  function renderMarket(){
+    let rows = OKX_ROWS.filter(r => r[0].toLowerCase().includes(filterText));
+    if(newsOnly) rows = rows.filter(r => NEWS_MAP[r[0]]);
+    rows.sort((a,b) => {
+      const i = keyIdx[sortKey];
+      if(i === undefined) return 0;
+      if(i === 0) return sortDir * a[0].localeCompare(b[0]);
+      return sortDir * (a[i] - b[i]);
+    });
+    marketCount.textContent = rows.length + ' / ' + OKX_ROWS.length + ' coin';
+    marketBody.innerHTML = rows.map(r => {
+      const [sym, px, chg, vol] = r;
+      const chgCls = chg > 0 ? 'mkt-up' : (chg < 0 ? 'mkt-down' : '');
+      const chgSign = chg > 0 ? '+' : '';
+      const news = NEWS_MAP[sym];
+      let newsCell, signalCell, rowCls = '';
+      if(news){
+        rowCls = ' class="has-news"';
+        newsCell = '<ul>' + news.items.map(it =>
+          '<li><span class="d '+it.d+'">'+(it.d==='bull'?'▲':it.d==='bear'?'▼':'●')+'</span><div><span class="h">'+it.h+'</span><div class="r">'+it.r+'</div></div></li>'
+        ).join('') + '</ul>';
+        signalCell = '<span class="'+SIGNAL_LABEL[news.signal]+'">'+news.label+'</span><div class="rationale" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.45;">'+news.rationale+'</div>';
+      } else {
+        newsCell = '<span class="none">Không có tin nổi bật</span>';
+        signalCell = '<span class="signal none">—</span>';
+      }
+      return '<tr'+rowCls+'><td>'+sym+'</td><td>$'+fmtPrice(px)+'</td><td class="'+chgCls+'">'+chgSign+chg.toFixed(2)+'%</td><td>$'+fmtVol(vol)+'</td><td class="mkt-news">'+newsCell+'</td><td class="mkt-signal">'+signalCell+'</td></tr>';
+    }).join('');
+  }
+
+  document.getElementById('marketSearch').addEventListener('input', (e) => {
+    filterText = e.target.value.trim().toLowerCase();
+    renderMarket();
+  });
+
+  document.getElementById('newsOnly').addEventListener('change', (e) => {
+    newsOnly = e.target.checked;
+    renderMarket();
+  });
+
+  document.querySelectorAll('#marketTable thead th').forEach(th => {
+    if(!SORTABLE.includes(th.dataset.key)) return;
+    th.addEventListener('click', () => {
+      const key = th.dataset.key;
+      if(sortKey === key){ sortDir *= -1; } else { sortKey = key; sortDir = -1; }
+      document.querySelectorAll('#marketTable thead th').forEach(t => t.classList.remove('sorted'));
+      th.classList.add('sorted');
+      renderMarket();
+    });
+  });
+
+  renderMarket();
+</script>
