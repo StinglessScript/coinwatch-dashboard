@@ -241,6 +241,17 @@
   }
   td.mkt-news .none{color:var(--muted);font-family:var(--font-mono);font-size:11.5px;}
   td.mkt-signal{text-align:left;min-width:170px;white-space:normal;font-family:var(--font-body);}
+  td.mkt-fresh{text-align:left;min-width:120px;white-space:normal;}
+  .fresh-badge{
+    font-family:var(--font-mono);font-size:11px;color:var(--muted);
+    background:var(--surface-2);border:1px solid var(--hairline);border-radius:4px;
+    padding:2px 6px;white-space:nowrap;
+  }
+  .fresh-badge.fresh-recent{color:var(--brass);border-color:color-mix(in srgb, var(--brass) 40%, transparent);background:var(--brass-soft);}
+  .potential-tag{
+    font-family:var(--font-mono);font-size:10.5px;color:var(--brass);font-weight:600;
+    margin-top:6px;
+  }
 
   footer{
     margin-top:36px;padding-top:16px;border-top:1px solid var(--hairline);
@@ -286,11 +297,16 @@
     <div class="market-head">
       <input class="market-search" id="marketSearch" type="text" placeholder="Tìm coin, vd. SOL, PEPE...">
       <label class="market-toggle"><input type="checkbox" id="newsOnly"> Chỉ hiện coin có tin tức</label>
+      <label class="market-toggle"><input type="checkbox" id="potentialOnly"> 🔍 Chỉ hiện tiềm năng chưa phản ánh giá</label>
       <span class="market-count" id="marketCount"></span>
     </div>
     <div class="disclaimer" style="margin-bottom:12px;">
       <span class="tag">Không phải dự đoán giá</span>
       <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~97 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant, Solana Compass, DomainNameWire...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
+    </div>
+    <div class="disclaimer" style="margin-bottom:12px;border-left-color:var(--brass);">
+      <span class="tag" style="color:var(--brass);">Về bộ lọc tiềm năng</span>
+      <span>Lọc "chưa phản ánh giá" chỉ so sánh <b>độ mới của tin</b> (≤5 ngày) với <b>biến động giá 24h hiện tại</b> (dưới 6%) — nghĩa là tin tích cực/trái chiều gần đây mà giá chưa chạy mạnh <i>trong 24h qua</i>. Đây KHÔNG phải dấu hiệu giá sắp tăng — có thể vì thị trường đã phản ứng vào đúng ngày tin ra (trước 24h gần nhất), vì tin chưa đủ mạnh, hoặc vì thị trường không quan tâm. Coin có tin cũ + giá đã chạy mạnh bị xếp cuối vì thông tin đó nhiều khả năng đã được phản ánh vào giá — không còn nhiều giá trị để tự nghiên cứu thêm.</span>
     </div>
     <div class="market-table-wrap">
       <table class="market" id="marketTable">
@@ -302,6 +318,7 @@
             <th data-key="vol">Khối lượng 24h (USD)</th>
             <th data-key="news" style="cursor:default;">Tin tức liên quan</th>
             <th data-key="signal" style="cursor:default;">Tín hiệu tin tức</th>
+            <th data-key="fresh" style="cursor:default;">Độ mới</th>
           </tr>
         </thead>
         <tbody id="marketBody"></tbody>
@@ -776,6 +793,21 @@
     return 2026*10000; // unknown/relative future refs sort as "this year", low priority within
   }
 
+  function daysAgo(dt){
+    // Days between "today" (data snapshot date) and a dt like "18/8". Imprecise/monthly refs (T8/2026) return a large number (not fresh).
+    if(!dt) return 9999;
+    const m = dt.match(/^(\d{1,2})\/(\d{1,2})$/);
+    if(!m) return 9999;
+    const today = new Date(2026, 7, 21); // dashboard reference date
+    const d = new Date(2026, parseInt(m[2],10)-1, parseInt(m[1],10));
+    return Math.round((today - d) / 86400000);
+  }
+
+  function freshestDaysAgo(news){
+    if(!news || !news.items || !news.items.length) return 9999;
+    return Math.min(...news.items.map(it => daysAgo(it.dt)));
+  }
+
   function fmtPrice(v){
     if(v >= 1000) return v.toLocaleString('en-US',{maximumFractionDigits:0});
     if(v >= 1) return v.toLocaleString('en-US',{maximumFractionDigits:2});
@@ -789,30 +821,50 @@
     return v.toFixed(0);
   }
 
-  let sortKey = 'vol', sortDir = -1, filterText = '', newsOnly = false;
+  let sortKey = 'vol', sortDir = -1, filterText = '', newsOnly = false, potentialOnly = false;
   const marketBody = document.getElementById('marketBody');
   const marketCount = document.getElementById('marketCount');
   const keyIdx = {sym:0, px:1, chg:2, vol:3};
   const SORTABLE = ['sym','px','chg','vol'];
+  const POTENTIAL_MAX_DAYS = 5;
+  const POTENTIAL_MAX_MOVE = 6;
 
   const SIGNAL_LABEL = {bull:'signal bull', bear:'signal bear', mixed:'signal mixed', none:'signal none'};
+
+  function isPotential(sym, chg){
+    const news = NEWS_MAP[sym];
+    if(!news || (news.signal !== 'bull' && news.signal !== 'mixed')) return false;
+    const fd = freshestDaysAgo(news);
+    return fd <= POTENTIAL_MAX_DAYS && Math.abs(chg) <= POTENTIAL_MAX_MOVE;
+  }
 
   function renderMarket(){
     let rows = OKX_ROWS.filter(r => r[0].toLowerCase().includes(filterText));
     if(newsOnly) rows = rows.filter(r => NEWS_MAP[r[0]]);
-    rows.sort((a,b) => {
-      const i = keyIdx[sortKey];
-      if(i === undefined) return 0;
-      if(i === 0) return sortDir * a[0].localeCompare(b[0]);
-      return sortDir * (a[i] - b[i]);
-    });
+    if(potentialOnly) rows = rows.filter(r => isPotential(r[0], r[2]));
+
+    if(potentialOnly){
+      rows.sort((a,b) => {
+        const fa = freshestDaysAgo(NEWS_MAP[a[0]]), fb = freshestDaysAgo(NEWS_MAP[b[0]]);
+        if(fa !== fb) return fa - fb;
+        return Math.abs(a[2]) - Math.abs(b[2]);
+      });
+    } else {
+      rows.sort((a,b) => {
+        const i = keyIdx[sortKey];
+        if(i === undefined) return 0;
+        if(i === 0) return sortDir * a[0].localeCompare(b[0]);
+        return sortDir * (a[i] - b[i]);
+      });
+    }
+
     marketCount.textContent = rows.length + ' / ' + OKX_ROWS.length + ' coin';
     marketBody.innerHTML = rows.map(r => {
       const [sym, px, chg, vol] = r;
       const chgCls = chg > 0 ? 'mkt-up' : (chg < 0 ? 'mkt-down' : '');
       const chgSign = chg > 0 ? '+' : '';
       const news = NEWS_MAP[sym];
-      let newsCell, signalCell, rowCls = '';
+      let newsCell, signalCell, freshCell, rowCls = '';
       if(news){
         rowCls = ' class="has-news"';
         const sortedItems = [...news.items].sort((a,b) => parseDt(b.dt) - parseDt(a.dt));
@@ -821,16 +873,27 @@
         ).join('') + '</ul>';
         const newest = sortedItems.length ? sortedItems[0].dt : '';
         signalCell = '<span class="'+SIGNAL_LABEL[news.signal]+'">'+news.label+'</span><div class="rationale" style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.45;">'+news.rationale+'</div>'+(newest ? '<div class="freshness">Tin mới nhất: '+newest+'</div>' : '');
+        const fd = freshestDaysAgo(news);
+        const fdLabel = fd >= 9999 ? 'không rõ ngày' : (fd === 0 ? 'hôm nay' : fd + ' ngày trước');
+        const potential = isPotential(sym, chg);
+        freshCell = '<span class="fresh-badge'+(fd<=POTENTIAL_MAX_DAYS?' fresh-recent':'')+'">'+fdLabel+'</span>'
+          + (potential ? '<div class="potential-tag">🔍 Tiềm năng chưa phản ánh</div>' : '');
       } else {
         newsCell = '<span class="none">Không có tin nổi bật</span>';
         signalCell = '<span class="signal none">—</span>';
+        freshCell = '<span class="fresh-badge">—</span>';
       }
-      return '<tr'+rowCls+'><td>'+sym+'</td><td>$'+fmtPrice(px)+'</td><td class="'+chgCls+'">'+chgSign+chg.toFixed(2)+'%</td><td>$'+fmtVol(vol)+'</td><td class="mkt-news">'+newsCell+'</td><td class="mkt-signal">'+signalCell+'</td></tr>';
+      return '<tr'+rowCls+'><td>'+sym+'</td><td>$'+fmtPrice(px)+'</td><td class="'+chgCls+'">'+chgSign+chg.toFixed(2)+'%</td><td>$'+fmtVol(vol)+'</td><td class="mkt-news">'+newsCell+'</td><td class="mkt-signal">'+signalCell+'</td><td class="mkt-fresh">'+freshCell+'</td></tr>';
     }).join('');
   }
 
   document.getElementById('marketSearch').addEventListener('input', (e) => {
     filterText = e.target.value.trim().toLowerCase();
+    renderMarket();
+  });
+
+  document.getElementById('potentialOnly').addEventListener('change', (e) => {
+    potentialOnly = e.target.checked;
     renderMarket();
   });
 
