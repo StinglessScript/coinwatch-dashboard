@@ -290,7 +290,7 @@
     </div>
     <div class="disclaimer" style="margin-bottom:12px;">
       <span class="tag">Không phải dự đoán giá</span>
-      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~71 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
+      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~87 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant, Solana Compass, DomainNameWire...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
     </div>
     <div class="market-table-wrap">
       <table class="market" id="marketTable">
@@ -651,6 +651,67 @@
     GRT: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Nâng cấp cơ chế thưởng và tích hợp AI agent mở rộng use-case thực tế.', items:[
       {d:'bull', dt:'T2026', h:'Phát triển "Rewards Eligibility Oracle" — xác minh chất lượng dữ liệu index', r:'Chuẩn proof-of-work mới cho việc phân phối thưởng.'},
       {d:'bull', dt:'T6/2026', h:'Ra mắt MCP server + AI agent skills (6/2026)', r:'Cho phép mô hình AI truy vấn dữ liệu on-chain bằng ngôn ngữ tự nhiên qua x402.'},
+    ]},
+  });
+  Object.assign(NEWS_MAP, {
+    POL: { signal:'mixed', label:'Trái chiều', rationale:'Đà tăng kỹ thuật đang hình thành và nền tảng thanh toán mới, nhưng công ty vừa cắt giảm nhân sự lần 2 trong năm khi chuyển hướng chiến lược.', items:[
+      {d:'bull', dt:'T7/2026', h:'Ra mắt bản xem trước "Open Money Stack"', r:'Nền tảng tích hợp ví, tuân thủ, thanh toán fiat — Polygon Labs chuyển hướng thành công ty thanh toán blockchain.'},
+      {d:'bear', dt:'T8/2026', h:'Sa thải nhân sự đợt 2 trong năm 2026', r:'Đi kèm hoàn tất mua lại Coinme, tái cơ cấu chiến lược.'},
+      {d:'bull', dt:'19/8', h:'Giá phá vỡ đường xu hướng giảm', r:'Động lực mua quay lại sau giai đoạn giảm kéo dài.'},
+    ]},
+    WLFI: { signal:'mixed', label:'Trái chiều', rationale:'Cột mốc pháp lý quan trọng từ OCC rất tích cực, nhưng việc thế chấp chính token của mình để vay là rủi ro cần lưu ý.', items:[
+      {d:'bull', dt:'T8/2026', h:'OCC chấp thuận sơ bộ cho phép lập ngân hàng uỷ thác quốc gia', r:'Đưa việc phát hành/lưu ký stablecoin USD1 (~4 tỷ USD vốn hoá) vào giám sát liên bang.'},
+      {d:'bull', dt:'16/8', h:'Tăng giá 2 chữ số trong tuần, ngược xu hướng giảm chung', r:'Một trong số ít token nổi bật tuần này.'},
+      {d:'bear', dt:'T8/2026', h:'Vay hàng chục triệu USD từ Dolomite, thế chấp bằng WLFI', r:'Bên tư vấn dự án cũng là đồng sáng lập Dolomite — rủi ro xung đột lợi ích và đòn bẩy.'},
+    ]},
+    SKY: { signal:'mixed', label:'Trái chiều', rationale:'Hoàn tất rebrand từ MakerDAO nhưng Coinbase vừa dừng hỗ trợ DAI trên nhiều chuỗi, giảm khả năng tiếp cận.', items:[
+      {d:'bear', dt:'17/8', h:'Coinbase dừng nạp/rút DAI trên Arbitrum, Optimism, Avalanche', r:'Giảm khả năng tiếp cận cho token liên quan hệ sinh thái Sky/MakerDAO.'},
+      {d:'neutral', dt:'T8/2026', h:'Hoàn tất chuyển đổi thương hiệu MakerDAO → Sky', r:'DAI tiếp tục tồn tại song song với token USDS mới.'},
+    ]},
+    CHZ: { signal:'mixed', label:'Trái chiều', rationale:'Giá giảm liên tục trong tháng dù mảng Fan Token vẫn mở rộng thêm đối tác mới.', items:[
+      {d:'bear', dt:'16/8', h:'Giảm 6,2% trong tuần', r:'Xu hướng giảm giá kéo dài qua nhiều phiên trong tháng 8.'},
+      {d:'bull', dt:'T8/2026', h:'Socios ra mắt Fan Token cho đội tuyển quốc gia thứ 4', r:'Tiếp nối Argentina, Bồ Đào Nha, Ý — mở rộng nhu cầu thực tế.'},
+    ]},
+    TRB: { signal:'none', label:'Không có tín hiệu nổi bật', rationale:'Giá đi ngang nhẹ, không tìm thấy catalyst tin tức cụ thể trong đợt tra cứu này.', items:[
+      {d:'neutral', dt:'T8/2026', h:'Giá dao động nhẹ quanh vùng hiện tại', r:'Không có sự kiện hay phát triển nổi bật được ghi nhận.'},
+    ]},
+    RAY: { signal:'bull', label:'Nghiêng tích cực', rationale:'Tốc độ mua lại token cao nhất từ đầu năm, nhiều tính năng sản phẩm mới ra mắt.', items:[
+      {d:'bull', dt:'8/8', h:'Mua lại ~150.000 USD RAY trong 3 ngày', r:'Tốc độ buyback nhanh nhất kể từ đầu năm 2026.'},
+      {d:'bull', dt:'17/8', h:'CLMM hỗ trợ tài sản hạn chế (KYC), LaunchLab mở rộng quote-asset', r:'Cho phép giao dịch tài sản KYC bằng cách đóng băng LP NFT.'},
+    ]},
+    LUNA: { signal:'mixed', label:'Trái chiều', rationale:'Kế hoạch bồi thường của SEC là tin tích cực cho nhà đầu tư cũ, nhưng thị trường đang cảnh giác với khả năng "bull trap".', items:[
+      {d:'bull', dt:'T8/2026', h:'Hạn chót SEC công bố kế hoạch bồi thường nhà đầu tư', r:'Sẽ bồi thường cho nhà đầu tư bị ảnh hưởng bởi sự sụp đổ Terra trước đây.'},
+      {d:'bear', dt:'13/8', h:'Cảnh báo "bull trap" lan truyền trên mạng xã hội', r:'Nhiều trader nghi ngờ đà tăng gần đây có thể đảo chiều mạnh.'},
+    ]},
+    FLOKI: { signal:'none', label:'Không có tín hiệu nổi bật', rationale:'Giá đi ngang theo tâm lý thị trường, không có catalyst nền tảng cụ thể trong ngắn hạn — các dự án Valhalla/TokenFi vẫn đang phát triển nhưng chưa ra mắt.', items:[
+      {d:'neutral', dt:'7/8', h:'Giá đi ngang nhẹ (+0,86%/24h), không có breakout', r:'Thị trường đang định giá theo tâm lý hơn là yếu tố nền tảng.'},
+    ]},
+    ENS: { signal:'bull', label:'Nghiêng tích cực', rationale:'Tái cấu trúc quản trị lớn được thông qua với tỷ lệ ủng hộ cao, tạo nền tảng tổ chức chuyên nghiệp hơn.', items:[
+      {d:'bull', dt:'11/8', h:'70% tokenholder thông qua tái cấu trúc ENS DAO thành tổ chức chính thức', r:'Lập hội đồng 5 người, giám đốc điều hành, quỹ vận hành ~65 triệu USD.'},
+      {d:'bull', dt:'12/8', h:'Mở đường xin cấp tên miền cấp cao nhất ".ens"', r:'Pháp nhân mới giúp dễ dàng nộp đơn lên ICANN.'},
+    ]},
+    SAND: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nhiều sản phẩm mới đang trong lộ trình ra mắt với sự tham gia đông đảo từ creator.', items:[
+      {d:'bull', dt:'T8/2026', h:'The Sandbox Studio chuyển từ alpha sang beta, hơn 12.000 lượt đăng ký', r:'Kèm sự kiện Game Jam thúc đẩy nội dung do người dùng tạo.'},
+      {d:'bull', dt:'T10/2026', h:'Studio Engine dự kiến ra mắt công khai tháng 10', r:'Thêm chế độ multiplayer, công cụ kiếm tiền, tạo nội dung bằng AI.'},
+    ]},
+    MANA: { signal:'mixed', label:'Trái chiều', rationale:'Đề xuất tăng phí có thể ảnh hưởng đến creator, trong khi giá đang tích luỹ chờ tín hiệu rõ ràng hơn.', items:[
+      {d:'bear', dt:'T8/2026', h:'DAO đề xuất tăng phí tạo Wearables/Emotes từ 5 lên 25 USD', r:'Nhằm nâng chất lượng nhưng có thể giảm động lực tham gia của creator nhỏ.'},
+      {d:'neutral', dt:'17/8', h:'Giá tích luỹ, cần vượt $0,069 để có tín hiệu tích cực', r:'Chưa có breakout rõ ràng.'},
+    ]},
+    EGLD: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nâng cấp mainnet quan trọng được hỗ trợ bởi sàn lớn, giá vượt trội so với BTC.', items:[
+      {d:'bull', dt:'4/8', h:'Upbit tạm dừng nạp/rút để hỗ trợ nâng cấp mainnet', r:'Nâng cấp máy ảo kích hoạt 6/8, cải thiện hiệu năng mạng.'},
+      {d:'bull', dt:'18/8', h:'Tăng 5,48%/24h, vượt trội so với BTC (+1,12%)', r:'Hưởng lợi từ dòng vốn xoay quanh nhóm L1 tương tác chuỗi như Polkadot.'},
+    ]},
+    YFI: { signal:'bull', label:'Nghiêng tích cực', rationale:'Đề xuất tokenomics mới hướng phần lớn doanh thu về cho staker, kế hoạch mở rộng đa chuỗi.', items:[
+      {d:'bull', dt:'T8/2026', h:'Đề xuất chia 90% doanh thu protocol cho người stake YFI', r:'Tái cân bằng động lực kinh tế token, tăng lợi ích trực tiếp cho holder.'},
+      {d:'bull', dt:'T8/2026', h:'Kế hoạch mở rộng hệ thống vault module đa chuỗi', r:'Cho phép triển khai hạ tầng Yearn ngoài Ethereum để bắt cơ hội lợi suất.'},
+    ]},
+    '1INCH': { signal:'mixed', label:'Trái chiều', rationale:'Trì hoãn CLARITY Act tạo bất định pháp lý ngắn hạn cho toàn DeFi, nhưng sản phẩm và nhân sự mới vẫn đang mở rộng.', items:[
+      {d:'bear', dt:'T8/2026', h:'Thượng viện Mỹ dời xem xét Đạo luật CLARITY sang tháng 9', r:'Thu hẹp cửa sổ thông qua luật cấu trúc thị trường crypto trong năm 2026.'},
+      {d:'bull', dt:'T7/2026', h:'Bổ nhiệm CPTO mới, ra mắt công khai "Aqua" (giao thức thanh khoản chung)', r:'Dẫn dắt chiến lược sản phẩm và hạ tầng định tuyến lõi.'},
+    ]},
+    GMX: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Duy trì tuân thủ MiCA mà không hạn chế người dùng EU — giữ vững khả năng tiếp cận thị trường.', items:[
+      {d:'bull', dt:'T7/2026', h:'Xác nhận hợp đồng thông minh vẫn permissionless, mở cho cả người dùng EU', r:'Duy trì khả năng tiếp cận sau khi MiCA có hiệu lực đầy đủ từ 1/7.'},
     ]},
   });
   NEWS_MAP.XAUT = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Tether Gold trong đợt tra cứu này — tài sản neo giá theo vàng vật chất.', items:[
