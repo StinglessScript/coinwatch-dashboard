@@ -290,7 +290,7 @@
     </div>
     <div class="disclaimer" style="margin-bottom:12px;">
       <span class="tag">Không phải dự đoán giá</span>
-      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~87 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant, Solana Compass, DomainNameWire...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
+      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~97 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant, Solana Compass, DomainNameWire...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
     </div>
     <div class="market-table-wrap">
       <table class="market" id="marketTable">
@@ -712,6 +712,45 @@
     ]},
     GMX: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Duy trì tuân thủ MiCA mà không hạn chế người dùng EU — giữ vững khả năng tiếp cận thị trường.', items:[
       {d:'bull', dt:'T7/2026', h:'Xác nhận hợp đồng thông minh vẫn permissionless, mở cho cả người dùng EU', r:'Duy trì khả năng tiếp cận sau khi MiCA có hiệu lực đầy đủ từ 1/7.'},
+    ]},
+  });
+  Object.assign(NEWS_MAP, {
+    BOME: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Bị Binance thu hẹp thanh khoản, dự báo kỹ thuật trung tính, không có catalyst tích cực mới.', items:[
+      {d:'bear', dt:'23/1', h:'Binance huỷ niêm yết 19 cặp giao dịch spot gồm BOME/BTC, BOME/ETH', r:'Gom thanh khoản về các cặp USD ổn định — giảm lựa chọn giao dịch cho BOME.'},
+      {d:'neutral', dt:'T8/2026', h:'Dự báo kỹ thuật trung tính cho 2026', r:'Giá vẫn thấp hơn nhiều so với đỉnh, biến động theo tâm lý mạng xã hội.'},
+    ]},
+    LIT: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Hợp tác hệ sinh thái mới, dù thông tin còn hạn chế trong đợt tra cứu này.', items:[
+      {d:'bull', dt:'T8/2026', h:'Hợp tác độc quyền với TunaChain', r:'Mang tính năng mới cho hệ sinh thái Litentry, dù chi tiết còn hạn chế.'},
+    ]},
+    ACE: { signal:'mixed', label:'Trái chiều', rationale:'Niêm yết mới và airdrop thúc đẩy volume mạnh, nhưng sắp có mở khoá token.', items:[
+      {d:'bull', dt:'13/8', h:'Bitget PoolX niêm yết ACE, airdrop 110.000 ACE', r:'Volume 24h tăng ~449% lên 75,74 triệu USD.'},
+      {d:'bear', dt:'18/8', h:'Mở khoá 2.966.040 ACE (2% tổng cung)', r:'Thêm áp lực pha loãng ngắn hạn.'},
+    ]},
+    GRVT: { signal:'mixed', label:'Trái chiều', rationale:'Niêm yết trên loạt sàn lớn tăng thanh khoản/uy tín, nhưng mở khoá token lớn sắp tới là rủi ro.', items:[
+      {d:'bull', dt:'2/8', h:'Niêm yết trên OKX X-Perps, Binance, Bybit, Coinbase Alpha', r:'Mở rộng tiếp cận phái sinh được quản lý tại châu Âu, tăng 5,7% sau TGE.'},
+      {d:'bear', dt:'29/8', h:'Mở khoá 63,9 triệu token (29/8), tiếp theo 73,63 triệu (29/11)', r:'Thanh khoản giai đoạn đầu còn mỏng, rủi ro pha loãng lớn.'},
+    ]},
+    PEOPLE: { signal:'none', label:'Không có tín hiệu nổi bật', rationale:'Không có tin tức nào được ghi nhận trong tuần 13-20/8 — dự án ngày càng ít được chú ý.', items:[
+      {d:'neutral', dt:'20/8', h:'Không có tin tức nào trong 7 ngày qua', r:'ConstitutionDAO/PEOPLE ngày càng ít xuất hiện trên tin tức.'},
+    ]},
+    GRAM: { signal:'bull', label:'Nghiêng tích cực', rationale:'Hoàn tất đổi thương hiệu, doanh thu công ty chiến lược tăng trưởng, nâng cấp mạng cải thiện hiệu năng.', items:[
+      {d:'bull', dt:'6/8', h:'Toncoin hoàn tất đổi tên thành Gram', r:'Kết nối lại với tầm nhìn ban đầu của Telegram.'},
+      {d:'bull', dt:'11/8', h:'TON Strategy Company báo cáo doanh thu staking ~15 triệu USD quý 2', r:'Tăng từ 2,2 triệu lên 9,4 triệu đơn vị Gram kiếm được.'},
+    ]},
+    RE: { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Tin tức tìm được (niêm yết perpetual trên OKX) là từ tháng 6/2026, không phải catalyst mới trong tháng 8.', items:[
+      {d:'neutral', dt:'T6/2026', h:'OKX niêm yết perpetual cho RE — tin cũ, không phải catalyst tháng 8', r:'Re là giao thức tái bảo hiểm on-chain kết nối vốn với bảo lãnh phát hành bảo hiểm Mỹ.'},
+    ]},
+    PAXG: { signal:'bull', label:'Nghiêng tích cực', rationale:'Hưởng lợi trực tiếp từ đà tăng giá vàng vật chất cộng với tín hiệu kỹ thuật tích cực.', items:[
+      {d:'bull', dt:'6/8', h:'Tăng giá mạnh theo đà tăng giá vàng', r:'Kết hợp breakout kỹ thuật và dòng tiền đầu cơ ngắn hạn.'},
+      {d:'bull', dt:'17/8', h:'EMA cắt lên, RSI 63,55 chưa vào vùng quá mua', r:'Phá vỡ đường xu hướng chặn mọi đợt tăng từ tháng 2.'},
+    ]},
+    DOS: { signal:'bull', label:'Nghiêng tích cực', rationale:'Ra mắt token mới với loạt niêm yết sàn lớn cùng lúc và tích hợp DeFi ngay từ đầu.', items:[
+      {d:'bull', dt:'10/8', h:'DAPPOS (DOS) ra mắt chính thức, niêm yết đồng loạt Bitget/XT/MEXC/KuCoin', r:'Chỉ ~20% cung lưu hành ban đầu, hoàn toàn từ hệ sinh thái/airdrop, không từ team/nhà đầu tư.'},
+      {d:'bull', dt:'11/8', h:'PancakeSwap ra mắt Syrup Pool cho DOS', r:'Cho phép stake CAKE để nhận thưởng DOS.'},
+    ]},
+    BICO: { signal:'bull', label:'Nghiêng tích cực', rationale:'Tăng giá mạnh đi kèm mở rộng công nghệ ví trừu tượng hoá tài khoản.', items:[
+      {d:'bull', dt:'8/8', h:'Tăng 48,84% trong ngày', r:'Đà tăng giá mạnh nhất trong đợt này.'},
+      {d:'bull', dt:'T2026', h:'Mở rộng account abstraction (ERC-4337) cùng Ethereum Foundation', r:'Chuẩn "smart batching" mới hỗ trợ ví hợp đồng thông minh thân thiện hơn.'},
     ]},
   });
   NEWS_MAP.XAUT = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Tether Gold trong đợt tra cứu này — tài sản neo giá theo vàng vật chất.', items:[
