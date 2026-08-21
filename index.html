@@ -281,7 +281,7 @@
     </div>
     <div class="disclaimer" style="margin-bottom:12px;">
       <span class="tag">Không phải dự đoán giá</span>
-      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~58 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar...) — routine hàng ngày sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
+      <span>Cột "Tín hiệu tin tức" là sắc thái của tin tức đã xảy ra, không phải dự đoán giá tăng/giảm. ~71 coin đã được tra cứu tin tức thực tế từ nhiều nguồn (CoinMarketCap, CoinDesk, The Block, Bitget, CoinGabbar, CryptoTimes, TheDefiant...) — routine hàng giờ sẽ tiếp tục mở rộng độ phủ dần theo thời gian thay vì làm hết trong 1 lần. Phần chưa tra cứu hiện "Không có tin nổi bật" thay vì suy đoán.</span>
     </div>
     <div class="market-table-wrap">
       <table class="market" id="marketTable">
@@ -582,6 +582,66 @@
       {d:'bear', h:'Giá phá vỡ vùng hỗ trợ $0,125-0,130, RSI quá bán (24)', r:'Áp lực bán mạnh trên khung 4 giờ.'},
       {d:'bull', h:'Hợp nhất các chuỗi, ra mắt gaming hub mới', r:'Giải quyết phân mảnh hệ sinh thái.'},
       {d:'bull', h:'Số lượng holder tăng từ 98.000 lên 98.560 trong 30 ngày', r:'Cho thấy tích luỹ âm thầm dù giá giảm.'},
+    ]},
+  });
+  Object.assign(NEWS_MAP, {
+    ASTER: { signal:'mixed', label:'Trái chiều', rationale:'Đốt token và nền tảng niêm yết mới tích cực, nhưng cấu trúc giá vẫn yếu và có áp lực bán.', items:[
+      {d:'bull', h:'Đốt 2,85 triệu ASTER (~1,74 triệu USD)', r:'Luỹ kế đốt đạt 188,87 triệu token, 3,78% mục tiêu giảm cung về 3 tỷ.'},
+      {d:'bull', h:'Ra mắt "Open Perpetual Listings" (11/8)', r:'Cho phép dự án niêm yết thị trường perpetual bằng cách stake 1 triệu ASTER trong 4 năm.'},
+      {d:'bear', h:'Cấu trúc giá vẫn giảm, áp lực bán tăng (chỉ báo OBV)', r:'Kháng cự quan trọng quanh $0,611 chưa vượt qua được.'},
+    ]},
+    KAITO: { signal:'mixed', label:'Trái chiều', rationale:'Mở khoá token lớn gây pha loãng, nhưng hệ thống uy tín mới sắp ra mắt có thể tạo nhu cầu bền vững hơn.', items:[
+      {d:'bear', h:'Mở khoá 32,6 triệu KAITO (~11,48 triệu USD, 20/8)', r:'Tương đương 7,63% cung lưu hành — áp lực pha loãng đáng kể.'},
+      {d:'bull', h:'Hệ thống uy tín "gKAITO" sắp ra mắt', r:'Thưởng cho nội dung chất lượng và đóng góp hệ sinh thái.'},
+    ]},
+    VIRTUAL: { signal:'mixed', label:'Trái chiều', rationale:'Giá tăng và vai trò hạ tầng AI agent vẫn dẫn đầu, nhưng phân tích kỹ thuật đang nghiêng giảm.', items:[
+      {d:'bull', h:'Tăng 10,8% trong ngày (20/8)', r:'Vẫn là hạ tầng dẫn đầu cho hơn 18.000 AI agent đang hoạt động.'},
+      {d:'bear', h:'Phân tích kỹ thuật từ sàn INDODAX gắn nhãn giảm giá (10/8)', r:'Bị từ chối tại các đường trung bình động WMA 75/85.'},
+    ]},
+    BONK: { signal:'mixed', label:'Trái chiều', rationale:'Sàn lớn Hàn Quốc lên kế hoạch huỷ niêm yết vì lo ngại bảo mật — rủi ro đáng kể dù đội ngũ vẫn ra sản phẩm mới.', items:[
+      {d:'bear', h:'Upbit dự kiến huỷ niêm yết BONK vào tháng 9', r:'Lý do liên quan sự cố bảo mật và yêu cầu công bố thông tin gần đây.'},
+      {d:'bull', h:'Ra mắt BONKplay.com với quỹ thưởng 1 triệu USD', r:'Phí nền tảng được dùng để đốt BONK.'},
+    ]},
+    GRASS: { signal:'mixed', label:'Trái chiều', rationale:'Vote chia sẻ doanh thu cho staker tích cực, nhưng mở khoá nhà đầu tư lớn (~25% cung) là rủi ro pha loãng đáng kể cuối tháng 10.', items:[
+      {d:'bull', h:'Vote quản trị chia sẻ doanh thu USDC cho staker được thông qua', r:'Doanh thu mạng ~33 triệu USD/năm, có thể tạo nhu cầu bền vững nếu tăng trưởng.'},
+      {d:'bear', h:'Mở khoá nhà đầu tư lớn (~25% cung) hoàn tất cuối tháng 10', r:'Rủi ro bán tháo đáng kể nếu holder chốt lời.'},
+    ]},
+    ZRO: { signal:'mixed', label:'Trái chiều', rationale:'Đối tác stablecoin lớn và kế hoạch layer-1 riêng tích cực dài hạn, nhưng mở khoá token và giá giảm tuần cho thấy áp lực bán ngắn hạn.', items:[
+      {d:'bull', h:'Hợp tác "Global Dollar" với hệ sinh thái USDG (5/8)', r:'Định vị LayerZero trong hạ tầng stablecoin liên chuỗi.'},
+      {d:'bear', h:'Mở khoá ~25,71 triệu ZRO (~19,39 triệu USD, 20/8)', r:'Giá giảm ~11,18% trong 7 ngày trước đợt mở khoá.'},
+      {d:'bull', h:'Đang xây layer-1 riêng "Zero", ra mắt dự kiến mùa thu 2026', r:'Hướng tới 2 triệu giao dịch/giây bằng zero-knowledge proof.'},
+    ]},
+    ETHFI: { signal:'bull', label:'Nghiêng tích cực', rationale:'Nâng cấp lớn thúc đẩy giá tăng mạnh, mở rộng sang cổ phiếu tokenized và cho vay.', items:[
+      {d:'bull', h:'Nâng cấp "Summer" giúp giá tăng gần 8% (17/8)', r:'Thêm tính năng giao dịch cổ phiếu, hàng hoá, chứng khoán tokenized.'},
+      {d:'bull', h:'Buyback được tài trợ bằng doanh thu thực tế', r:'Mô hình kinh tế token bền vững hơn.'},
+    ]},
+    CORE: { signal:'bear', label:'Nghiêng tiêu cực', rationale:'Giá chạm đáy lịch sử và vừa xảy ra sự cố bảo mật nghiêm trọng trên cầu nối.', items:[
+      {d:'bear', h:'Giá chạm đáy lịch sử $0,01678 (31/7)', r:'Giảm hơn 99,5% so với đỉnh 2023.'},
+      {d:'bear', h:'Cầu nối Coreum Bridge bị khai thác, mất 200.000 XRP (11/8)', r:'Lỗi xác minh nghiêm trọng trong cơ chế cầu nối chéo chuỗi.'},
+    ]},
+    PNUT: { signal:'bull', label:'Nghiêng tích cực (chỉ về giá, không có nền tảng)', rationale:'Giá và khối lượng tăng mạnh, nhưng đây là memecoin thuần tuý không có tiện ích hay quản trị.', items:[
+      {d:'bull', h:'Tăng 24% trong 24h, khối lượng 31,26 triệu USD', r:'Không có catalyst nền tảng cụ thể — thuần tuý biến động giá memecoin.'},
+      {d:'neutral', h:'Bạch thư từ Bitstamp xác nhận không có tiện ích/quản trị', r:'Nguồn cung cố định, quyền phát hành đã bị thu hồi.'},
+    ]},
+    JTO: { signal:'bull', label:'Nghiêng tích cực', rationale:'Chương trình buyback + đốt token từ doanh thu sàn giao dịch riêng đã chính thức kích hoạt.', items:[
+      {d:'bull', h:'JIP-38 kích hoạt: 100% doanh thu từ JTX dùng để mua lại + đốt JTO', r:'Ràng buộc đến ít nhất Q4/2027, cam kết dài hạn.'},
+      {d:'bull', h:'Tăng ~13% trong 7 ngày', r:'Đà tăng đi kèm cơ chế tokenomics mới.'},
+    ]},
+    MORPHO: { signal:'bull', label:'Nghiêng tích cực', rationale:'Dòng rút khỏi sàn kỷ lục (tín hiệu tích luỹ), sản phẩm mới liên tục ra mắt.', items:[
+      {d:'bull', h:'Rút kỷ lục 5,59 triệu token khỏi sàn trong 1 ngày (13/8)', r:'Lớn nhất kể từ khi token có thể chuyển nhượng (11/2024).'},
+      {d:'bull', h:'Ra mắt Quoter Bot mã nguồn mở + vault Pendle mới', r:'Mở rộng hạ tầng tín dụng, tăng 9,84% trong tuần.'},
+    ]},
+    LDO: { signal:'mixed', label:'Trái chiều', rationale:'Dòng vốn tổ chức lớn là tín hiệu tích cực mạnh, nhưng bị một sàn lớn huỷ niêm yết.', items:[
+      {d:'bull', h:'SharpLink Gaming stake 200 triệu USD qua Lido (14/8)', r:'Chuyển đổi ETH sang wstETH, lưu ký tổ chức qua Anchorage Digital.'},
+      {d:'bear', h:'Bitfinex huỷ niêm yết LDO cùng 12 token khác (17/8)', r:'Hạn rút tài sản đến 10h UTC ngày 31/8.'},
+    ]},
+    ARKM: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Mở rộng sản phẩm tình báo on-chain với tích hợp tin tức AI thời gian thực.', items:[
+      {d:'bull', h:'Tích hợp Tree News làm nguồn tin độc quyền cho Arkham Insights', r:'Đưa tin tức breaking trực tiếp vào AI phân tích của Arkham.'},
+      {d:'bull', h:'Thêm giao thức thanh toán x402 (5/8)', r:'Mở rộng khả năng truy vấn dữ liệu on-chain bằng ngôn ngữ tự nhiên.'},
+    ]},
+    GRT: { signal:'bull', label:'Nghiêng tích cực (nhẹ)', rationale:'Nâng cấp cơ chế thưởng và tích hợp AI agent mở rộng use-case thực tế.', items:[
+      {d:'bull', h:'Phát triển "Rewards Eligibility Oracle" — xác minh chất lượng dữ liệu index', r:'Chuẩn proof-of-work mới cho việc phân phối thưởng.'},
+      {d:'bull', h:'Ra mắt MCP server + AI agent skills (6/2026)', r:'Cho phép mô hình AI truy vấn dữ liệu on-chain bằng ngôn ngữ tự nhiên qua x402.'},
     ]},
   });
   NEWS_MAP.XAUT = { signal:'none', label:'Chưa tìm thấy tin trong 24h', rationale:'Không tìm thấy tin tức cụ thể cho Tether Gold trong đợt tra cứu này — tài sản neo giá theo vàng vật chất.', items:[
